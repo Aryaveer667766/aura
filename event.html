@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're Invited</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans (Minimal) & Playfair Display (Elegant) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        brand: { 50: '#f0fdfa', 500: '#14b8a6', 900: '#134e4a' },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS for specific theme animations -->
+    <style>
+        .fade-in-slow {
+            animation: fadeInSlow 1.5s ease-out forwards;
+        }
+        @keyframes fadeInSlow {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Elegant Theme Specifics */
+        .elegant-border {
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            outline: 1px solid rgba(217, 119, 6, 0.1);
+            outline-offset: 8px;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col transition-colors duration-700" id="body-container">
+
+    <!-- Loading State -->
+    <div id="loading-state" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="w-10 h-10 border-2 border-slate-200 border-t-slate-800 rounded-full animate-spin mb-4"></div>
+        <p class="text-sm tracking-widest text-slate-500 uppercase font-medium">Opening Invitation...</p>
+    </div>
+
+    <!-- Dynamic Content Injected Here -->
+    <main id="event-content" class="flex-grow w-full h-full hidden opacity-0 transition-opacity duration-1000">
+        <!-- JS will populate this -->
+    </main>
+
+    <!-- Optional: Subtle "Powered by Aura" Badge -->
+    <a href="index.html" class="fixed bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider hover:text-brand-500 transition-colors z-40">
+        Powered by Aura
+    </a>
+
+    <script type="module" src="js/event.js"></script>
+</body>
+</html>
