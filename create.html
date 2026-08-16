@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Event | Aura</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: { brand: { 50: '#f0fdfa', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' } }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Simple Navbar -->
+    <nav class="w-full bg-white border-b border-slate-200 px-6 py-4">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center text-white font-bold">A</div>
+                <span class="font-bold text-xl tracking-tight text-slate-900">Aura</span>
+            </a>
+            <a href="index.html" class="text-sm font-medium text-slate-500 hover:text-slate-900">Cancel</a>
+        </div>
+    </nav>
+
+    <!-- Main Wizard Area -->
+    <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6">
+        <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            
+            <!-- Progress Bar -->
+            <div class="bg-slate-50 px-8 py-6 border-b border-slate-100">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider" id="step-indicator">Step 1 of 4</span>
+                    <span class="text-xs font-medium text-slate-400" id="step-title">Event Type</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-1.5">
+                    <div id="progress-bar" class="bg-brand-500 h-1.5 rounded-full transition-all duration-500 ease-out" style="width: 25%"></div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="p-8 sm:p-10">
+                <form id="wizard-form" onsubmit="return false;">
+                    
+                    <!-- STEP 1: Event Type -->
+                    <div id="step-1" class="wizard-step">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">What are you celebrating?</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Radio Cards -->
+                            <label class="cursor-pointer">
+                                <input type="radio" name="eventType" value="Wedding" class="peer sr-only" checked>
+                                <div class="p-6 rounded-2xl border-2 border-slate-100 peer-checked:border-brand-500 peer-checked:bg-brand-50 hover:bg-slate-50 transition-all">
+                                    <div class="text-2xl mb-2">💍</div>
+                                    <div class="font-semibold text-slate-900">Wedding</div>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="eventType" value="Birthday" class="peer sr-only">
+                                <div class="p-6 rounded-2xl border-2 border-slate-100 peer-checked:border-brand-500 peer-checked:bg-brand-50 hover:bg-slate-50 transition-all">
+                                    <div class="text-2xl mb-2">🎂</div>
+                                    <div class="font-semibold text-slate-900">Birthday</div>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="eventType" value="Anniversary" class="peer sr-only">
+                                <div class="p-6 rounded-2xl border-2 border-slate-100 peer-checked:border-brand-500 peer-checked:bg-brand-50 hover:bg-slate-50 transition-all">
+                                    <div class="text-2xl mb-2">🥂</div>
+                                    <div class="font-semibold text-slate-900">Anniversary</div>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="eventType" value="Other" class="peer sr-only">
+                                <div class="p-6 rounded-2xl border-2 border-slate-100 peer-checked:border-brand-500 peer-checked:bg-brand-50 hover:bg-slate-50 transition-all">
+                                    <div class="text-2xl mb-2">✨</div>
+                                    <div class="font-semibold text-slate-900">Other Event</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Details -->
+                    <div id="step-2" class="wizard-step hidden">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">The Details</h2>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Honoree Name(s) *</label>
+                                <input type="text" id="eventNames" placeholder="e.g., Sarah & James" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Date of Event *</label>
+                                <input type="date" id="eventDate" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Personal Message</label>
+                                <textarea id="eventMessage" rows="3" placeholder="We can't wait to celebrate with you!" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Themes -->
+                    <div id="step-3" class="wizard-step hidden">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Choose your aesthetic</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Theme 1 -->
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="themeSelection" value="minimal" class="peer sr-only" checked>
+                                <div class="rounded-2xl border-2 border-slate-100 peer-checked:border-brand-500 overflow-hidden hover:shadow-md transition-all">
+                                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80" alt="Minimal Theme" class="w-full h-32 object-cover">
+                                    <div class="p-3 bg-white">
+                                        <div class="font-semibold text-slate-900">Modern Minimal</div>
+                                    </div>
+                                </div>
+                                <div class="absolute top-3 right-3 w-6 h-6 bg-brand-500 rounded-full text-white flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            </label>
+                            <!-- Theme 2 -->
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="themeSelection" value="elegant" class="peer sr-only">
+                                <div class="rounded-2xl border-2 border-slate-100 peer-checked:border-brand-500 overflow-hidden hover:shadow-md transition-all">
+                                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80" alt="Elegant Theme" class="w-full h-32 object-cover">
+                                    <div class="p-3 bg-white">
+                                        <div class="font-semibold text-slate-900">Classic Elegance</div>
+                                    </div>
+                                </div>
+                                <div class="absolute top-3 right-3 w-6 h-6 bg-brand-500 rounded-full text-white flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-opacity shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: Checkout -->
+                    <div id="step-4" class="wizard-step hidden text-center">
+                        <div class="w-20 h-20 bg-brand-50 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">You're all set!</h2>
+                        <p class="text-slate-600 mb-8">Pay securely to instantly generate and publish your custom website link.</p>
+                        
+                        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-8">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-slate-600">Premium Event Website</span>
+                                <span class="font-semibold text-slate-900">₹199</span>
+                            </div>
+                            <div class="w-full h-px bg-slate-200 my-4"></div>
+                            <div class="flex justify-between items-center text-lg">
+                                <span class="font-bold text-slate-900">Total</span>
+                                <span class="font-bold text-brand-600">₹199</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+                <button id="btn-back" class="hidden px-6 py-2.5 rounded-full text-slate-600 font-medium hover:bg-slate-200 transition-colors">
+                    Back
+                </button>
+                <div class="flex-grow"></div> <!-- Spacer -->
+                <button id="btn-next" class="px-8 py-2.5 rounded-full bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    Next Step
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module" src="js/create.js"></script>
+</body>
+</html>
