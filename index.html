@@ -1,178 +1,739 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura | Premium Celebration Websites</title>
-    
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS (CDN for rapid Vanilla development) -->
+    <title>JTET CBT Mock Test</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tailwind Config for Custom Colors/Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            user-select: none;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Palette Button Shapes - standard CBT styles */
+        .pal-btn {
+            width: 40px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 4px;
+            border-radius: 4px;
+            color: black;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 0: Not Visited */
+        .status-0 { background-color: #f3f4f6; border: 1px solid #d1d5db; }
+        /* 1: Not Answered (Red) */
+        .status-1 { background-color: #ef4444; color: white; border: 1px solid #b91c1c; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;}
+        /* 2: Answered (Green) */
+        .status-2 { background-color: #22c55e; color: white; border: 1px solid #15803d; border-top-left-radius: 12px; border-top-right-radius: 12px;}
+        /* 3: Marked (Purple) */
+        .status-3 { background-color: #a855f7; color: white; border: 1px solid #7e22ce; border-radius: 50%; }
+        /* 4: Answered & Marked (Purple with green dot) */
+        .status-4 { background-color: #a855f7; color: white; border: 1px solid #7e22ce; border-radius: 50%; position: relative;}
+        .status-4::after { content: ''; position: absolute; bottom: 4px; right: 4px; width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; border: 1px solid white;}
+
+        .radio-custom:checked + label {
+            font-weight: 600;
+            color: #1d4ed8;
+        }
+        
+        .radio-custom {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-[#1e3a8a] text-white py-3 px-6 flex justify-between items-center shadow-md shrink-0">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold tracking-wide">JTET Paper 2 (Class 6-8) CBT</h1>
+        </div>
+        <div class="flex items-center gap-8 font-medium">
+            <div class="flex flex-col text-right">
+                <span class="text-sm text-blue-200">Candidate Name</span>
+                <span class="font-bold">Aryaveer Mishra</span>
+            </div>
+            <div class="bg-blue-900 px-4 py-2 rounded shadow-inner border border-blue-800 text-center">
+                <span class="text-sm block text-blue-200 mb-1 leading-none">Time Left</span>
+                <span id="timerDisplay" class="text-xl font-mono font-bold text-yellow-300">150:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div id="mainCbtArea" class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Side: Question Area -->
+        <main class="flex-1 flex flex-col bg-white border-r border-gray-300 relative">
+            
+            <!-- Subject Tabs -->
+            <div id="subjectTabs" class="flex border-b border-gray-300 bg-gray-50 shrink-0 overflow-x-auto">
+                <!-- Tabs will be injected here -->
+            </div>
+
+            <!-- Question Display Box -->
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-700" id="qNumberHeading">Question No. 1</h2>
+                    <span class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded" id="qSubjectBadge">Social Studies</span>
+                </div>
+                
+                <div class="text-lg font-medium text-gray-800 mb-6 leading-relaxed" id="questionText">
+                    <!-- Question goes here -->
+                </div>
+                
+                <div class="flex flex-col gap-4" id="optionsContainer">
+                    <!-- Options go here -->
+                </div>
+            </div>
+
+            <!-- Action Buttons Footer -->
+            <div class="bg-gray-100 p-4 border-t border-gray-300 flex justify-between items-center shrink-0">
+                <div class="flex gap-3">
+                    <button onclick="handleMarkAndNext()" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded font-medium shadow transition-colors text-sm border border-purple-800">Mark for Review & Next</button>
+                    <button onclick="handleClearResponse()" class="bg-white hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded font-medium shadow transition-colors text-sm border border-gray-300">Clear Response</button>
+                    <button onclick="handlePrevious()" class="bg-white hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded font-medium shadow transition-colors text-sm border border-gray-300">Previous</button>
+                </div>
+                <button onclick="handleSaveAndNext()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-2.5 rounded font-bold shadow transition-colors text-sm border border-green-800">Save & Next</button>
+            </div>
+        </main>
+
+        <!-- Right Side: Palette & Panel -->
+        <aside class="w-80 bg-white flex flex-col shrink-0 z-10">
+            <!-- Profile mini -->
+            <div class="p-4 border-b border-gray-200 flex items-center gap-3 bg-blue-50">
+                <div class="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold text-xl border-2 border-blue-400">AM</div>
+                <div>
+                    <div class="text-sm text-gray-500">Roll No:</div>
+                    <div class="font-bold text-gray-800">JTET20268945</div>
+                </div>
+            </div>
+
+            <!-- Status Legend -->
+            <div class="p-4 border-b border-gray-200 grid grid-cols-2 gap-y-3 gap-x-2 text-xs font-medium text-gray-600 bg-gray-50 shrink-0">
+                <div class="flex items-center gap-2"><div class="pal-btn status-2 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-ans">0</div> Answered</div>
+                <div class="flex items-center gap-2"><div class="pal-btn status-1 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-notans">0</div> Not Answered</div>
+                <div class="flex items-center gap-2"><div class="pal-btn status-0 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-notvis">150</div> Not Visited</div>
+                <div class="flex items-center gap-2"><div class="pal-btn status-3 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-marked">0</div> Marked</div>
+            </div>
+
+            <!-- Question Palette -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <h3 class="text-sm font-bold text-gray-700 mb-3" id="paletteTitle">Section: Social Studies</h3>
+                <div class="flex flex-wrap gap-1 justify-start" id="paletteGrid">
+                    <!-- Palette buttons injected here -->
+                </div>
+            </div>
+
+            <!-- Submit Panel -->
+            <div class="p-4 border-t border-gray-300 bg-gray-100 text-center shrink-0">
+                <button onclick="confirmSubmit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow-md transition-colors">Submit Test</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Result Screen (Hidden by default) -->
+    <div id="resultArea" class="hidden flex-1 bg-gray-50 flex items-center justify-center p-6 overflow-y-auto">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-4xl w-full border border-gray-200">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-green-600 mb-2">Test Submitted Successfully!</h2>
+                <p class="text-gray-600">Candidate: <span class="font-bold text-gray-800">Aryaveer Mishra</span> | Roll No: JTET20268945</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
+                    <div class="text-sm text-blue-600 font-bold uppercase tracking-wider">Total Score</div>
+                    <div class="text-4xl font-bold text-blue-800 mt-1" id="resTotalScore">0</div>
+                    <div class="text-xs text-blue-500 mt-1">out of 150</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg border border-green-100 text-center">
+                    <div class="text-sm text-green-600 font-bold uppercase tracking-wider">Attempted</div>
+                    <div class="text-4xl font-bold text-green-800 mt-1" id="resAttempted">0</div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg border border-red-100 text-center">
+                    <div class="text-sm text-red-600 font-bold uppercase tracking-wider">Correct</div>
+                    <div class="text-4xl font-bold text-red-800 mt-1" id="resCorrect">0</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center">
+                    <div class="text-sm text-gray-600 font-bold uppercase tracking-wider">Accuracy</div>
+                    <div class="text-4xl font-bold text-gray-800 mt-1" id="resAccuracy">0%</div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Subject-wise Breakdown</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-sm">
+                            <th class="p-3 border">Subject</th>
+                            <th class="p-3 border text-center">Total Qs</th>
+                            <th class="p-3 border text-center">Attempted</th>
+                            <th class="p-3 border text-center">Correct</th>
+                            <th class="p-3 border text-center">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resTableBody" class="text-sm">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button onclick="location.reload()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded shadow transition-colors">Restart Test</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Submission confirmation / Alerts -->
+    <div id="modalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+            <h3 class="text-xl font-bold text-gray-800 mb-2" id="modalTitle">Confirm Submission</h3>
+            <p class="text-gray-600 mb-6" id="modalText">Are you sure you want to submit the test? You cannot change your answers after submission.</p>
+            <div class="flex justify-end gap-3" id="modalActions">
+                <button onclick="closeModal()" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium">Cancel</button>
+                <button onclick="executeSubmit()" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            500: '#14b8a6', // Teal base
-                            600: '#0d9488',
-                            900: '#134e4a',
-                        }
+        // ---------------------------------------------------------
+        // 1. DATA: 150 UNIQUE QUESTIONS (Syllabus based)
+        // ---------------------------------------------------------
+        // Subjects:
+        // 0: Social Studies (50) - Hindi
+        // 1: Nagpuri (30) - Devanagari
+        // 2: Computer (20) - Hindi
+        // 3: Hindi (25) - Hindi
+        // 4: English (25) - English
+
+        const subjectsData = [
+            { id: 0, name: "सामाजिक विज्ञान (Social Studies)", code: "SS", count: 50, start: 0, end: 49 },
+            { id: 1, name: "नागपुरी (Nagpuri)", code: "NAG", count: 30, start: 50, end: 79 },
+            { id: 2, name: "कंप्यूटर (Computer)", code: "COMP", count: 20, start: 80, end: 99 },
+            { id: 3, name: "हिंदी (Hindi)", code: "HIN", count: 25, start: 100, end: 124 },
+            { id: 4, name: "English", code: "ENG", count: 25, start: 125, end: 149 }
+        ];
+
+        // Format: { q: "Question", o: ["A", "B", "C", "D"], a: 0 (Correct index), s: 0 (Subject ID) }
+        const questions = [
+            // --- SOCIAL STUDIES (50 Qs) ---
+            { q: "झारखण्ड का गठन किस वर्ष हुआ था?", o: ["15 नवम्बर 2000", "1 नवम्बर 2000", "9 नवम्बर 2000", "15 अगस्त 1947"], a: 0, s: 0 },
+            { q: "सिंधु घाटी सभ्यता का प्रमुख बंदरगाह कौन सा था?", o: ["कालीबंगा", "लोथल", "मोहनजोदड़ो", "हड़प्पा"], a: 1, s: 0 },
+            { q: "भारतीय संविधान की प्रारूप समिति के अध्यक्ष कौन थे?", o: ["डॉ. राजेंद्र प्रसाद", "जवाहरलाल नेहरू", "डॉ. बी. आर. अंबेडकर", "सरदार पटेल"], a: 2, s: 0 },
+            { q: "कर्क रेखा भारत के कितने राज्यों से होकर गुजरती है?", o: ["7", "8", "9", "6"], a: 1, s: 0 },
+            { q: "झारखण्ड का सबसे ऊँचा जलप्रपात कौन सा है?", o: ["हुंडरू", "दशम", "लोध (बूढ़ाघाघ)", "जोन्हा"], a: 2, s: 0 },
+            { q: "मौर्य वंश का संस्थापक कौन था?", o: ["अशोक", "बिंदुसार", "चंद्रगुप्त मौर्य", "बृहद्रथ"], a: 2, s: 0 },
+            { q: "भारत में मौलिक अधिकारों की संख्या कितनी है?", o: ["5", "6", "7", "8"], a: 1, s: 0 },
+            { q: "वायुमंडल में सबसे अधिक गैस कौन सी पाई जाती है?", o: ["ऑक्सीजन", "कार्बन डाइऑक्साइड", "नाइट्रोजन", "आर्गन"], a: 2, s: 0 },
+            { q: "बिरसा मुंडा का जन्म कहाँ हुआ था?", o: ["उलिहातू", "खूंटी", "रांची", "तमाड़"], a: 0, s: 0 },
+            { q: "प्रथम विश्व युद्ध कब शुरू हुआ था?", o: ["1912", "1914", "1918", "1939"], a: 1, s: 0 },
+            { q: "भारतीय संसद के कितने अंग हैं?", o: ["2", "3", "4", "5"], a: 1, s: 0 }, // Lok Sabha, Rajya Sabha, President
+            { q: "विश्व का सबसे बड़ा महाद्वीप कौन सा है?", o: ["अफ्रीका", "यूरोप", "उत्तरी अमेरिका", "एशिया"], a: 3, s: 0 },
+            { q: "दामोदर नदी का उद्गम स्थल कहाँ है?", o: ["अमरकंटक", "छोटानागपुर का पठार", "राजमहल की पहाड़ियाँ", "पारसनाथ"], a: 1, s: 0 },
+            { q: "भारत छोड़ो आंदोलन किस वर्ष प्रारंभ हुआ?", o: ["1920", "1930", "1942", "1947"], a: 2, s: 0 },
+            { q: "संविधान सभा की प्रथम बैठक कब हुई थी?", o: ["9 दिसंबर 1946", "26 जनवरी 1950", "15 अगस्त 1947", "26 नवंबर 1949"], a: 0, s: 0 },
+            { q: "सुंदरबन डेल्टा किस नदी द्वारा बनता है?", o: ["गंगा", "ब्रह्मपुत्र", "गंगा और ब्रह्मपुत्र", "गोदावरी"], a: 2, s: 0 },
+            { q: "झारखण्ड में तांबे का प्रमुख खान कहाँ स्थित है?", o: ["जादूगोड़ा", "घाटशिला", "झरिया", "नोवामुंडी"], a: 1, s: 0 },
+            { q: "गौतम बुद्ध ने अपना पहला उपदेश कहाँ दिया था?", o: ["बोधगया", "लुंबिनी", "सारनाथ", "कुशीनगर"], a: 2, s: 0 },
+            { q: "राज्यसभा का पदेन सभापति कौन होता है?", o: ["राष्ट्रपति", "प्रधानमंत्री", "उपराष्ट्रपति", "लोकसभा अध्यक्ष"], a: 2, s: 0 },
+            { q: "भारत का मानक समय किस देशांतर से लिया गया है?", o: ["82.5° पूर्व", "82.5° पश्चिम", "80° पूर्व", "90° पूर्व"], a: 0, s: 0 },
+            { q: "संथाल विद्रोह का नेतृत्व किसने किया था?", o: ["सिद्धू-कान्हू", "बिरसा मुंडा", "तिलका मांझी", "भागीरथ मांझी"], a: 0, s: 0 },
+            { q: "मुगल साम्राज्य की स्थापना किसने की?", o: ["अकबर", "बाबर", "हुमायूँ", "जहाँगीर"], a: 1, s: 0 },
+            { q: "पंचायती राज व्यवस्था सबसे पहले किस राज्य में लागू हुई?", o: ["राजस्थान", "आंध्र प्रदेश", "उत्तर प्रदेश", "मध्य प्रदेश"], a: 0, s: 0 },
+            { q: "भारत का सबसे दक्षिणी बिंदु कौन सा है?", o: ["कन्याकुमारी", "इंदिरा पॉइंट", "रामेश्वरम", "पोर्ट ब्लेयर"], a: 1, s: 0 },
+            { q: "झारखण्ड का राजकीय पशु क्या है?", o: ["बाघ", "शेर", "हाथी", "हिरण"], a: 2, s: 0 },
+            { q: "प्लासी का युद्ध कब हुआ था?", o: ["1757", "1764", "1857", "1526"], a: 0, s: 0 },
+            { q: "संविधान के किस अनुच्छेद में अस्पृश्यता के अंत का प्रावधान है?", o: ["अनुच्छेद 14", "अनुच्छेद 17", "अनुच्छेद 19", "अनुच्छेद 21"], a: 1, s: 0 },
+            { q: "भूकंप की तीव्रता मापने वाला यंत्र कौन सा है?", o: ["बैरोमीटर", "थर्मामीटर", "सिस्मोग्राफ", "लैक्टोमीटर"], a: 2, s: 0 },
+            { q: "टाना भगत आंदोलन की शुरुआत कब हुई?", o: ["1914", "1857", "1920", "1942"], a: 0, s: 0 },
+            { q: "भारतीय राष्ट्रीय कांग्रेस की स्थापना कब हुई?", o: ["1885", "1905", "1919", "1947"], a: 0, s: 0 },
+            { q: "सर्वोच्च न्यायालय के न्यायाधीशों की सेवानिवृत्ति आयु क्या है?", o: ["60 वर्ष", "62 वर्ष", "65 वर्ष", "70 वर्ष"], a: 2, s: 0 },
+            { q: "नील नदी किस महाद्वीप में बहती है?", o: ["एशिया", "अफ्रीका", "दक्षिण अमेरिका", "यूरोप"], a: 1, s: 0 },
+            { q: "पारसनाथ पहाड़ी झारखण्ड के किस जिले में स्थित है?", o: ["गिरिडीह", "धनबाद", "बोकारो", "हजारीबाग"], a: 0, s: 0 },
+            { q: "आर्य समाज के संस्थापक कौन थे?", o: ["राजा राममोहन राय", "स्वामी दयानंद सरस्वती", "स्वामी विवेकानंद", "ईश्वर चंद्र विद्यासागर"], a: 1, s: 0 },
+            { q: "लोकसभा में अधिकतम सदस्यों की संख्या कितनी हो सकती है?", o: ["545", "552", "500", "550"], a: 1, s: 0 },
+            { q: "काली मिट्टी किस फसल के लिए सर्वाधिक उपयुक्त है?", o: ["गेहूँ", "कपास", "चाय", "गन्ना"], a: 1, s: 0 },
+            { q: "झारखण्ड में कोयले की सबसे बड़ी खान कहाँ है?", o: ["बोकारो", "झरिया", "रामगढ़", "चतरा"], a: 1, s: 0 },
+            { q: "वास्कोडिगामा भारत कब आया था?", o: ["1492", "1498", "1502", "1526"], a: 1, s: 0 },
+            { q: "भारतीय संविधान में समवर्ती सूची किस देश से ली गई है?", o: ["अमेरिका", "कनाडा", "ऑस्ट्रेलिया", "आयरलैंड"], a: 2, s: 0 },
+            { q: "भारत की सबसे लंबी नदी कौन सी है?", o: ["ब्रह्मपुत्र", "यमुना", "गोदावरी", "गंगा"], a: 3, s: 0 },
+            { q: "झारखण्ड का क्षेत्रफल भारत के कुल क्षेत्रफल का कितना प्रतिशत है?", o: ["2.42%", "3.5%", "1.8%", "4.2%"], a: 0, s: 0 },
+            { q: "जलियांवाला बाग हत्याकांड कब हुआ था?", o: ["13 अप्रैल 1919", "15 अगस्त 1947", "26 जनवरी 1950", "9 अगस्त 1942"], a: 0, s: 0 },
+            { q: "मुख्य चुनाव आयुक्त की नियुक्ति कौन करता है?", o: ["प्रधानमंत्री", "राष्ट्रपति", "मुख्य न्यायाधीश", "संसद"], a: 1, s: 0 },
+            { q: "माउंट एवरेस्ट किस देश में स्थित है?", o: ["भारत", "चीन", "नेपाल", "भूटान"], a: 2, s: 0 },
+            { q: "झारखण्ड विधानसभा में सदस्यों की कुल संख्या कितनी है?", o: ["81", "82", "80", "85"], a: 1, s: 0 }, // 81 elected + 1 nominated = 82
+            { q: "सती प्रथा का अंत किसके प्रयासों से हुआ?", o: ["राजा राममोहन राय", "लॉर्ड डलहौजी", "महात्मा गांधी", "ज्योतिबा फुले"], a: 0, s: 0 },
+            { q: "वित्त आयोग का गठन संविधान के किस अनुच्छेद के तहत किया जाता है?", o: ["अनुच्छेद 280", "अनुच्छेद 324", "अनुच्छेद 356", "अनुच्छेद 368"], a: 0, s: 0 },
+            { q: "सूर्य के सबसे निकट का ग्रह कौन सा है?", o: ["शुक्र", "मंगल", "बुध", "पृथ्वी"], a: 2, s: 0 },
+            { q: "झारखण्ड की उपराजधानी कहाँ है?", o: ["दुमका", "देवघर", "जमशेदपुर", "बोकारो"], a: 0, s: 0 },
+            { q: "टीपू सुल्तान कहाँ का शासक था?", o: ["हैदराबाद", "मैसूर", "अवध", "बंगाल"], a: 1, s: 0 },
+
+            // --- NAGPURI (30 Qs) ---
+            { q: "'नागपुरी' भाषा कर संबंध केकर से आहे?", o: ["मागधी अपभ्रंश", "शौरसेनी अपभ्रंश", "अर्धमागधी", "पैशाची"], a: 0, s: 1 },
+            { q: "नागपुरी साहित्य कर प्रथम कवि केके मानल जायला?", o: ["घासीराम", "रघुनाथ नृपति", "हनुमान सिंह", "बरजू राम"], a: 1, s: 1 },
+            { q: "'छौवा' कर माने का होला?", o: ["बुजुर्ग", "बच्चा", "आदमी", "औरत"], a: 1, s: 1 },
+            { q: "नागपुरी में लिंग कर कइ गो भेद होला?", o: ["दुई", "तीन", "चार", "एक"], a: 0, s: 1 }, // Basically male/female behaviorally
+            { q: "'करम' परब कहिया मनाल जायला?", o: ["भादो एकादशी", "सावन पूर्णिमा", "कार्तिक अमावस्या", "चैत रामनवमी"], a: 0, s: 1 },
+            { q: "'बेटा' कर बहुवचन का होवी?", o: ["बेटामन", "बेटासब", "बेटी", "बेटालोग"], a: 0, s: 1 },
+            { q: "नागपुरी भाषा कर पहिल व्याकरण के लिखलें?", o: ["पीटर शांति नवरंगी", "रेव. ई. एच. व्हिटली", "डॉ. श्रवण कुमार गोस्वामी", "फादर बुकाउट"], a: 1, s: 1 },
+            { q: "'खोंइछा' का के कहल जायला?", o: ["लुगा कर पइरा", "गहना", "बर्तन", "खाना"], a: 0, s: 1 },
+            { q: "सरहुल परब में केकर पूजा होला?", o: ["नीम गाछ", "सखुआ गाछ", "पीपर गाछ", "बरगद गाछ"], a: 1, s: 1 },
+            { q: "'गछ' कर माने का होला?", o: ["पानी", "आसमान", "पेड़", "जमीन"], a: 2, s: 1 },
+            { q: "नागपुरी में 'हम' ले का शब्द प्रयोग होला?", o: ["मोय", "तोय", "उ", "रउरे"], a: 0, s: 1 },
+            { q: "फगुआ गीत कहिया गावल जायला?", o: ["दिवाली में", "होली में", "दशहरा में", "तीज में"], a: 1, s: 1 },
+            { q: "'लुगा' माने का होला?", o: ["कपड़ा", "जूता", "छतरी", "झोला"], a: 0, s: 1 },
+            { q: "नागपुरी लोकगीत में सबले बेसी का गावल जायला?", o: ["डमकच", "झूमर", "उदासी", "पावस"], a: 1, s: 1 },
+            { q: "'खेत' कर पर्यायवाची नागपुरी में का होला?", o: ["टांड़ / दोन", "पहाड़", "नदी", "जंगल"], a: 0, s: 1 },
+            { q: "'आइंज' कर उल्टा का होवी?", o: ["काईल", "परसों", "नरसों", "आज"], a: 0, s: 1 },
+            { q: "डमकच नाच कहिया नाचत हैं?", o: ["बिहा-मड़वा में", "मरनी में", "खेत जोते बेरा", "पूजा में"], a: 0, s: 1 },
+            { q: "नागपुरी भाषा के और का कहल जायला?", o: ["सादरी", "भोजपुरी", "मगही", "मैथिली"], a: 0, s: 1 },
+            { q: "'पइसा' के नागपुरी में का कहेना?", o: ["कौड़ी / टका", "रुपया", "मुद्रा", "धन"], a: 0, s: 1 },
+            { q: "'सुते' कर माने का होला?", o: ["जागना", "सोना", "बैठना", "दौड़ना"], a: 1, s: 1 },
+            { q: "नागपुरी में आदर सूचक शब्द का हेके?", o: ["तोय", "रउरे", "उ", "ई"], a: 1, s: 1 },
+            { q: "'मउहा' से का बनल जायला?", o: ["रोटी", "दारू", "सब्जी", "दाल"], a: 1, s: 1 },
+            { q: "नागपुरी में स्वर वर्ण कइ गो है?", o: ["8", "7", "11", "10"], a: 0, s: 1 }, // General accepted 8-10, 8 is common in old grammar
+            { q: "जीतिया परब केकर ले मनाल जायला?", o: ["भाई ले", "बेटा-छौवा ले", "पति ले", "बाप ले"], a: 1, s: 1 },
+            { q: "'बइठेक' कर माने?", o: ["बैठना", "उठना", "चलना", "खाना"], a: 0, s: 1 },
+            { q: "'बाघ' कर स्त्रीलिंग का होवी?", o: ["बाघिन", "बाघी", "बघनी", "शेरनी"], a: 0, s: 1 },
+            { q: "सोहराई परब में केकर पूजा होला?", o: ["गाय-गरु", "चांद", "सूरज", "नदी"], a: 0, s: 1 },
+            { q: "'काँदो' माने का?", o: ["कीचड़", "पानी", "बालू", "पत्थर"], a: 0, s: 1 },
+            { q: "नागपुरी में 'हाँ' के का कहेना?", o: ["हँ", "ना", "का", "हाँ"], a: 0, s: 1 },
+            { q: "ठाकुर विश्वनाथ शाहदेव कर संबंध केकर से आहे?", o: ["1857 कर सिपाही विद्रोह", "टाना भगत", "संथाल हूल", "कोल विद्रोह"], a: 0, s: 1 },
+
+            // --- COMPUTER (20 Qs) ---
+            { q: "कंप्यूटर का पितामह किसे कहा जाता है?", o: ["चार्ल्स बैबेज", "बिल गेट्स", "स्टीव जॉब्स", "एलन ट्यूरिंग"], a: 0, s: 2 },
+            { q: "CPU का पूर्ण रूप क्या है?", o: ["Central Processing Unit", "Central Program Unit", "Computer Processing Unit", "Control Processing Unit"], a: 0, s: 2 },
+            { q: "1 बाइट (Byte) में कितने बिट (Bit) होते हैं?", o: ["4", "8", "16", "32"], a: 1, s: 2 },
+            { q: "इनमें से कौन सा इनपुट डिवाइस नहीं है?", o: ["कीबोर्ड", "माउस", "मॉनिटर", "स्कैनर"], a: 2, s: 2 },
+            { q: "RAM का पूर्ण रूप क्या है?", o: ["Read Access Memory", "Random Access Memory", "Run All Memory", "Random Active Memory"], a: 1, s: 2 },
+            { q: "www का आविष्कार किसने किया था?", o: ["टिम बर्नर्स ली", "विंट सर्फ़", "मार्क जुकरबर्ग", "लैरी पेज"], a: 0, s: 2 },
+            { q: "MS Word किस प्रकार का सॉफ्टवेयर है?", o: ["सिस्टम सॉफ्टवेयर", "एप्लीकेशन सॉफ्टवेयर", "ऑपरेटिंग सिस्टम", "यूटिलिटी सॉफ्टवेयर"], a: 1, s: 2 },
+            { q: "कंप्यूटर को रीस्टार्ट (Restart) करने की प्रक्रिया को क्या कहते हैं?", o: ["Cold Booting", "Warm Booting", "Formatting", "Downloading"], a: 1, s: 2 },
+            { q: "URL का फुल फॉर्म क्या है?", o: ["Uniform Resource Locator", "Universal Resource Locator", "Uniform Route Locator", "Universal Route Locator"], a: 0, s: 2 },
+            { q: "कट (Cut) करने की शॉर्टकट की (Shortcut Key) क्या है?", o: ["Ctrl + C", "Ctrl + V", "Ctrl + X", "Ctrl + Z"], a: 2, s: 2 },
+            { q: "इनमें से कौन सा ऑपरेटिंग सिस्टम नहीं है?", o: ["Windows", "Linux", "Oracle", "Mac OS"], a: 2, s: 2 },
+            { q: "डेटा को सुरक्षित रखने के लिए हम किसका उपयोग करते हैं?", o: ["पासवर्ड", "एंटीवायरस", "बैकअप", "ये सभी"], a: 3, s: 2 },
+            { q: "ईमेल (Email) का फुल फॉर्म क्या है?", o: ["Electronic Mail", "Electric Mail", "Easy Mail", "Extra Mail"], a: 0, s: 2 },
+            { q: "MS Excel में बनने वाली फ़ाइल को क्या कहते हैं?", o: ["Document", "Workbook", "Presentation", "Database"], a: 1, s: 2 },
+            { q: "कंप्यूटर में किसी फ़ाइल को हमेशा के लिए डिलीट करने के लिए क्या दबाते हैं?", o: ["Delete", "Shift + Delete", "Ctrl + Delete", "Alt + Delete"], a: 1, s: 2 },
+            { q: "LAN का पूर्ण रूप क्या है?", o: ["Local Area Network", "Large Area Network", "Light Area Network", "Local Access Network"], a: 0, s: 2 },
+            { q: "इंटरनेट एक्सप्लोरर (Internet Explorer) क्या है?", o: ["वेब ब्राउज़र", "सर्च इंजन", "ऑपरेटिंग सिस्टम", "हार्डवेयर"], a: 0, s: 2 },
+            { q: "पीडीएफ (PDF) का फुल फॉर्म क्या है?", o: ["Portable Document Format", "Printed Document Format", "Public Document File", "Portable Data Format"], a: 0, s: 2 },
+            { q: "कीबोर्ड (Keyboard) में 'F' कुंजियों (Function keys) की संख्या कितनी होती है?", o: ["10", "12", "14", "15"], a: 1, s: 2 },
+            { q: "वाई-फाई (Wi-Fi) का पूर्ण रूप क्या है?", o: ["Wireless Fidelity", "Wireless Find", "Wire Fidelity", "Wireless Format"], a: 0, s: 2 },
+
+            // --- HINDI (25 Qs) ---
+            { q: "हिन्दी वर्णमाला में स्वरों की संख्या कितनी है?", o: ["10", "11", "13", "33"], a: 1, s: 3 },
+            { q: "‘कमल’ का पर्यायवाची शब्द कौन सा नहीं है?", o: ["जलज", "पंकज", "नीरज", "जलद"], a: 3, s: 3 }, // Jalad is cloud
+            { q: "‘आकाश’ का विलोम शब्द क्या है?", o: ["धरती", "पाताल", "अंबर", "जमीन"], a: 1, s: 3 },
+            { q: "जिसका कोई शत्रु न हो, उसे क्या कहते हैं?", o: ["अजेय", "अजातशत्रु", "मित्र", "शत्रुघ्न"], a: 1, s: 3 },
+            { q: "‘आँख का तारा’ मुहावरे का क्या अर्थ है?", o: ["बहुत प्यारा", "दुश्मन", "आँख में दर्द होना", "तारा देखना"], a: 0, s: 3 },
+            { q: "संधि के कितने भेद होते हैं?", o: ["दो", "तीन", "चार", "पाँच"], a: 1, s: 3 }, // Swar, Vyanjan, Visarg
+            { q: "‘विद्यालय’ शब्द में कौन सी संधि है?", o: ["दीर्घ संधि", "गुण संधि", "वृद्धि संधि", "यण संधि"], a: 0, s: 3 },
+            { q: "समास के मुख्य रूप से कितने भेद होते हैं?", o: ["चार", "पाँच", "छह", "सात"], a: 2, s: 3 },
+            { q: "‘नीलकंठ’ में कौन सा समास है?", o: ["बहुव्रीहि समास", "द्विगु समास", "कर्मधारय समास", "द्वंद्व समास"], a: 0, s: 3 },
+            { q: "‘सूर्य’ का स्त्रीलिंग क्या होगा?", o: ["सूर्या", "सूरी", "सूर्याणी", "इनमें से कोई नहीं"], a: 0, s: 3 },
+            { q: "जो ईश्वर में विश्वास रखता हो, उसे क्या कहते हैं?", o: ["नास्तिक", "आस्तिक", "धार्मिक", "पुजारी"], a: 1, s: 3 },
+            { q: "‘अमृत’ का पर्यायवाची शब्द है:", o: ["विष", "सुधा", "अंबु", "उदक"], a: 1, s: 3 },
+            { q: "इनमें से शुद्ध वर्तनी वाला शब्द छाँटिए।", o: ["आशिर्वाद", "आशीर्वाद", "अशीर्वाद", "आशीर्बाद"], a: 1, s: 3 },
+            { q: "कवि का स्त्रीलिंग क्या है?", o: ["कवित्री", "कवयित्री", "कविनी", "कवयत्री"], a: 1, s: 3 },
+            { q: "‘अपना हाथ जगन्नाथ’ का अर्थ है:", o: ["ईश्वर की कृपा", "अपने हाथ से काम करना ही अच्छा होता है", "हाथ की पूजा करना", "स्वार्थी होना"], a: 1, s: 3 },
+            { q: "‘नदी’ शब्द का बहुवचन क्या होगा?", o: ["नदियाँ", "नदियें", "नदियां", "नदीयाँ"], a: 0, s: 3 }, // नदियाँ
+            { q: "कारक के कितने भेद होते हैं?", o: ["6", "7", "8", "9"], a: 2, s: 3 },
+            { q: "‘पेड़ से पत्ता गिरा’ - इस वाक्य में कौन सा कारक है?", o: ["कर्म कारक", "करण कारक", "अपादान कारक", "संबंध कारक"], a: 2, s: 3 },
+            { q: "सर्वनाम के कितने प्रकार होते हैं?", o: ["चार", "पाँच", "छह", "सात"], a: 2, s: 3 },
+            { q: "विशेषण के मुख्य कितने भेद होते हैं?", o: ["तीन", "चार", "पाँच", "छह"], a: 1, s: 3 },
+            { q: "‘महेश’ का संधि विच्छेद क्या होगा?", o: ["मही + ईश", "महा + ईश", "महे + श", "महा + अश"], a: 1, s: 3 },
+            { q: "‘अनुराग’ का विलोम क्या है?", o: ["विराग", "सुराग", "पराजय", "प्रेम"], a: 0, s: 3 },
+            { q: "‘नौ दो ग्यारह होना’ मुहावरे का अर्थ है:", o: ["गणित सीखना", "भाग जाना", "पकड़े जाना", "इकट्ठा होना"], a: 1, s: 3 },
+            { q: "‘रचना’ के आधार पर वाक्य के कितने भेद होते हैं?", o: ["दो", "तीन", "चार", "आठ"], a: 1, s: 3 }, // Saral, Sanyukt, Mishra
+            { q: "हिन्दी किस लिपि में लिखी जाती है?", o: ["ब्राह्मी", "देवनागरी", "गुरुमुखी", "रोमन"], a: 1, s: 3 },
+
+            // --- ENGLISH (25 Qs) ---
+            { q: "Choose the synonym for 'Beautiful'.", o: ["Ugly", "Pretty", "Bad", "Angry"], a: 1, s: 4 },
+            { q: "What is the antonym of 'Accept'?", o: ["Agree", "Refuse", "Take", "Allow"], a: 1, s: 4 },
+            { q: "Fill in the blank: She _____ to the market yesterday.", o: ["go", "goes", "went", "going"], a: 2, s: 4 },
+            { q: "Identify the noun in the sentence: 'The quick brown fox jumps.'", o: ["quick", "brown", "fox", "jumps"], a: 2, s: 4 },
+            { q: "Choose the correct article: 'He is _____ honest man.'", o: ["a", "an", "the", "no article"], a: 1, s: 4 },
+            { q: "Select the correctly spelt word.", o: ["Grammer", "Grammar", "Gramar", "Gramer"], a: 1, s: 4 },
+            { q: "What is the plural of 'Child'?", o: ["Childs", "Childrens", "Children", "Childes"], a: 2, s: 4 },
+            { q: "Fill in the blank with the correct preposition: 'The book is _____ the table.'", o: ["in", "on", "at", "under"], a: 1, s: 4 },
+            { q: "Which of the following is an adjective?", o: ["Run", "Quickly", "Happy", "Happiness"], a: 2, s: 4 },
+            { q: "Change into indirect speech: He said, 'I am busy.'", o: ["He said that he is busy.", "He said that he was busy.", "He said me he was busy.", "He say he is busy."], a: 1, s: 4 },
+            { q: "Find the error: 'He don't know the answer.'", o: ["He", "don't", "know", "the answer"], a: 1, s: 4 }, // doesn't
+            { q: "A person who does not believe in God is called an:", o: ["Atheist", "Theist", "Priest", "Optimist"], a: 0, s: 4 },
+            { q: "Choose the correct verb: 'The dogs _____ barking.'", o: ["is", "are", "am", "was"], a: 1, s: 4 },
+            { q: "What is the past participle of 'Write'?", o: ["Wrote", "Written", "Writing", "Writes"], a: 1, s: 4 },
+            { q: "A group of lions is called a:", o: ["Flock", "Herd", "Pride", "Swarm"], a: 2, s: 4 },
+            { q: "Fill in the blank: 'I have been living here _____ 2010.'", o: ["for", "since", "from", "in"], a: 1, s: 4 },
+            { q: "Identify the conjunction: 'He is poor but honest.'", o: ["He", "is", "poor", "but"], a: 3, s: 4 },
+            { q: "Meaning of the idiom 'To add fuel to the fire':", o: ["To help someone", "To make a bad situation worse", "To cook food", "To stay warm"], a: 1, s: 4 },
+            { q: "What is the comparative degree of 'Good'?", o: ["Best", "Better", "Gooder", "More good"], a: 1, s: 4 },
+            { q: "Change the voice: 'He writes a letter.'", o: ["A letter is written by him.", "A letter was written by him.", "A letter is write by him.", "He is writing a letter."], a: 0, s: 4 },
+            { q: "The word 'Information' is a:", o: ["Countable noun", "Uncountable noun", "Proper noun", "Verb"], a: 1, s: 4 },
+            { q: "Choose the correct spelling:", o: ["Recieve", "Receive", "Resieve", "Receve"], a: 1, s: 4 },
+            { q: "Fill in the blank: 'Either Ram _____ Shyam has done this.'", o: ["nor", "and", "or", "but"], a: 2, s: 4 },
+            { q: "A piece of cake means:", o: ["A difficult task", "A sweet dish", "A very easy task", "Something impossible"], a: 2, s: 4 },
+            { q: "Identify the tense: 'I am eating an apple.'", o: ["Simple Present", "Present Continuous", "Past Continuous", "Present Perfect"], a: 1, s: 4 }
+        ];
+
+        // ---------------------------------------------------------
+        // 2. STATE VARIABLES
+        // ---------------------------------------------------------
+        const TOTAL_QUESTIONS = questions.length; // Should be 150
+        let currentQuestionIndex = 0;
+        let activeSubjectId = 0;
+        
+        // 0: Not Visited, 1: Not Answered, 2: Answered, 3: Marked, 4: Answered & Marked
+        let questionStatuses = new Array(TOTAL_QUESTIONS).fill(0); 
+        
+        // Store user answers (-1 means no answer)
+        let userAnswers = new Array(TOTAL_QUESTIONS).fill(-1); 
+        
+        // Timer (150 minutes = 9000 seconds)
+        let timeLeft = 150 * 60; 
+        let timerInterval;
+
+        // Ensure Question 0 is set to Not Answered initially (since it's visited)
+        questionStatuses[0] = 1;
+
+        // ---------------------------------------------------------
+        // 3. INITIALIZATION & UI RENDERING
+        // ---------------------------------------------------------
+        document.addEventListener("DOMContentLoaded", () => {
+            initSubjectTabs();
+            renderPalette();
+            loadQuestion(0);
+            updateLegendCounters();
+            startTimer();
+        });
+
+        function initSubjectTabs() {
+            const tabsContainer = document.getElementById("subjectTabs");
+            tabsContainer.innerHTML = "";
+            subjectsData.forEach((sub, idx) => {
+                const btn = document.createElement("button");
+                btn.className = `px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-4 transition-colors ${idx === activeSubjectId ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent text-gray-600 hover:text-blue-500 hover:bg-gray-100'}`;
+                btn.textContent = `${sub.name} (${sub.count})`;
+                btn.onclick = () => {
+                    activeSubjectId = idx;
+                    initSubjectTabs(); // re-render to update active state
+                    renderPalette();
+                    // Jump to first question of this subject
+                    jumpToQuestion(sub.start);
+                };
+                tabsContainer.appendChild(btn);
+            });
+            document.getElementById("paletteTitle").textContent = `Section: ${subjectsData[activeSubjectId].name}`;
+        }
+
+        function renderPalette() {
+            const grid = document.getElementById("paletteGrid");
+            grid.innerHTML = "";
+            
+            const currentSub = subjectsData[activeSubjectId];
+            
+            for (let i = currentSub.start; i <= currentSub.end; i++) {
+                const btn = document.createElement("div");
+                // The status determines the CSS class
+                let statusClass = `status-${questionStatuses[i]}`;
+                
+                // If it's the currently active question, give it a highlight
+                let borderHighlight = i === currentQuestionIndex ? "ring-2 ring-blue-500 ring-offset-1 scale-110 z-10" : "";
+                
+                btn.className = `pal-btn ${statusClass} ${borderHighlight}`;
+                btn.textContent = (i + 1);
+                btn.onclick = () => jumpToQuestion(i);
+                grid.appendChild(btn);
+            }
+        }
+
+        function updateLegendCounters() {
+            let counts = {0:0, 1:0, 2:0, 3:0, 4:0};
+            questionStatuses.forEach(s => counts[s]++);
+            
+            document.getElementById("cnt-notvis").textContent = counts[0];
+            document.getElementById("cnt-notans").textContent = counts[1];
+            document.getElementById("cnt-ans").textContent = counts[2] + counts[4]; // Combine answered & answered+marked for standard display
+            document.getElementById("cnt-marked").textContent = counts[3] + counts[4];
+        }
+
+        // ---------------------------------------------------------
+        // 4. QUESTION NAVIGATION & LOGIC
+        // ---------------------------------------------------------
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questions[index];
+            
+            // Auto-switch subject tab if navigating crosses boundaries
+            if (q.s !== activeSubjectId) {
+                activeSubjectId = q.s;
+                initSubjectTabs();
+                renderPalette();
+            }
+
+            // Update Status (if not visited, make it not answered)
+            if (questionStatuses[index] === 0) {
+                questionStatuses[index] = 1;
+            }
+
+            // Update UI Elements
+            document.getElementById("qNumberHeading").textContent = `Question No. ${index + 1}`;
+            document.getElementById("qSubjectBadge").textContent = subjectsData[q.s].name;
+            document.getElementById("questionText").textContent = q.q;
+
+            // Render Options
+            const optionsContainer = document.getElementById("optionsContainer");
+            optionsContainer.innerHTML = "";
+            
+            q.o.forEach((optText, optIdx) => {
+                const label = document.createElement("label");
+                label.className = "flex items-start p-3 border border-gray-200 rounded cursor-pointer hover:bg-blue-50 transition-colors bg-white";
+                
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "currentQuestionOpt";
+                radio.value = optIdx;
+                radio.className = "radio-custom mt-1 mr-3";
+                
+                // Restore previous answer if exists
+                if (userAnswers[index] === optIdx) {
+                    radio.checked = true;
+                    label.classList.add("border-blue-500", "bg-blue-50");
+                }
+
+                radio.onchange = () => {
+                    // Visual update for checked state
+                    document.querySelectorAll('label').forEach(l => {
+                        l.classList.remove("border-blue-500", "bg-blue-50");
+                    });
+                    label.classList.add("border-blue-500", "bg-blue-50");
+                };
+
+                const textSpan = document.createElement("span");
+                textSpan.className = "text-base text-gray-700 select-none";
+                textSpan.textContent = optText;
+
+                label.appendChild(radio);
+                label.appendChild(textSpan);
+                optionsContainer.appendChild(label);
+            });
+
+            // Re-render palette to show highlighting and status changes
+            renderPalette();
+            updateLegendCounters();
+        }
+
+        function getSelectedOption() {
+            const selected = document.querySelector('input[name="currentQuestionOpt"]:checked');
+            return selected ? parseInt(selected.value) : -1;
+        }
+
+        function jumpToQuestion(index) {
+            // Save current state implicitly? No, usually in CBT, jumping without 'Save' might not save in some systems, but modern systems auto-save.
+            // TCS iON requires explicitly clicking Save. If you just jump, the answer is NOT saved.
+            // We will follow: If you just click palette, whatever is checked is NOT officially saved UNLESS it was saved before.
+            // So we just load the new question.
+            loadQuestion(index);
+        }
+
+        function handleSaveAndNext() {
+            const selected = getSelectedOption();
+            if (selected !== -1) {
+                userAnswers[currentQuestionIndex] = selected;
+                questionStatuses[currentQuestionIndex] = 2; // Answered
+            } else {
+                // If cleared or nothing selected
+                if(userAnswers[currentQuestionIndex] !== -1) {
+                    // Previously had answer, now doesn't (cleared manually via button, but this path is rare)
+                } else {
+                    questionStatuses[currentQuestionIndex] = 1; // Not Answered
+                }
+            }
+            goToNext();
+        }
+
+        function handleMarkAndNext() {
+            const selected = getSelectedOption();
+            if (selected !== -1) {
+                userAnswers[currentQuestionIndex] = selected;
+                questionStatuses[currentQuestionIndex] = 4; // Answered & Marked
+            } else {
+                questionStatuses[currentQuestionIndex] = 3; // Marked
+            }
+            goToNext();
+        }
+
+        function handleClearResponse() {
+            document.querySelectorAll('input[name="currentQuestionOpt"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('label').forEach(l => l.classList.remove("border-blue-500", "bg-blue-50"));
+            userAnswers[currentQuestionIndex] = -1;
+            questionStatuses[currentQuestionIndex] = 1; // Revert to Not Answered
+            renderPalette();
+            updateLegendCounters();
+        }
+
+        function handlePrevious() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function goToNext() {
+            if (currentQuestionIndex < TOTAL_QUESTIONS - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                // Last question, re-render to update status of last question
+                renderPalette();
+                updateLegendCounters();
+                showModal("End of Test", "You have reached the end of the test. Please review your answers or submit.");
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 5. TIMER
+        // ---------------------------------------------------------
+        function startTimer() {
+            const display = document.getElementById("timerDisplay");
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    display.textContent = "00:00";
+                    forceSubmit();
+                } else {
+                    timeLeft--;
+                    let m = Math.floor(timeLeft / 60);
+                    let s = timeLeft % 60;
+                    display.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    if(timeLeft < 300) { // last 5 mins
+                        display.classList.add("text-red-500", "animate-pulse");
+                    }
+                }
+            }, 1000);
+        }
+
+        // ---------------------------------------------------------
+        // 6. MODAL & SUBMISSION
+        // ---------------------------------------------------------
+        function showModal(title, text, isSubmit = false) {
+            document.getElementById("modalTitle").textContent = title;
+            document.getElementById("modalText").textContent = text;
+            
+            const actions = document.getElementById("modalActions");
+            if (isSubmit) {
+                actions.innerHTML = `
+                    <button onclick="closeModal()" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium">Cancel</button>
+                    <button onclick="executeSubmit()" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium">Yes, Submit</button>
+                `;
+            } else {
+                actions.innerHTML = `
+                    <button onclick="closeModal()" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium">OK</button>
+                `;
+            }
+            
+            document.getElementById("modalOverlay").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("modalOverlay").classList.add("hidden");
+        }
+
+        function confirmSubmit() {
+            showModal("Confirm Submission", "Are you sure you want to submit the test? You cannot change your answers after submission.", true);
+        }
+
+        function forceSubmit() {
+            closeModal();
+            executeSubmit();
+        }
+
+        function executeSubmit() {
+            clearInterval(timerInterval);
+            closeModal();
+            document.getElementById("mainCbtArea").classList.add("hidden");
+            document.getElementById("resultArea").classList.remove("hidden");
+            
+            calculateResults();
+        }
+
+        function calculateResults() {
+            let totalCorrect = 0;
+            let totalAttempted = 0;
+            
+            let subjectStats = subjectsData.map(sub => ({
+                name: sub.name,
+                total: sub.count,
+                attempted: 0,
+                correct: 0
+            }));
+
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                let ans = userAnswers[i];
+                let subId = questions[i].s;
+                
+                if (ans !== -1) {
+                    totalAttempted++;
+                    subjectStats[subId].attempted++;
+                    
+                    if (ans === questions[i].a) {
+                        totalCorrect++;
+                        subjectStats[subId].correct++;
                     }
                 }
             }
+
+            document.getElementById("resTotalScore").textContent = totalCorrect;
+            document.getElementById("resAttempted").textContent = totalAttempted;
+            document.getElementById("resCorrect").textContent = totalCorrect;
+            
+            let accuracy = totalAttempted > 0 ? ((totalCorrect / totalAttempted) * 100).toFixed(1) : 0;
+            document.getElementById("resAccuracy").textContent = accuracy + "%";
+
+            const tbody = document.getElementById("resTableBody");
+            tbody.innerHTML = "";
+            
+            subjectStats.forEach(stat => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b hover:bg-gray-50";
+                tr.innerHTML = `
+                    <td class="p-3 border font-medium">${stat.name}</td>
+                    <td class="p-3 border text-center">${stat.total}</td>
+                    <td class="p-3 border text-center">${stat.attempted}</td>
+                    <td class="p-3 border text-center text-green-600 font-bold">${stat.correct}</td>
+                    <td class="p-3 border text-center font-bold">${stat.correct}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
     </script>
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white">
-
-    <!-- Navigation -->
-    <nav class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center text-white font-bold text-xl">A</div>
-                    <span class="font-bold text-2xl tracking-tight text-slate-900">Aura</span>
-                </div>
-
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#how-it-works" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">How it Works</a>
-                    <a href="#themes" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Themes</a>
-                    <a href="dashboard.html" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Login</a>
-                    <a href="create.html" class="px-5 py-2.5 rounded-full bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                        Create Website
-                    </a>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-slate-900 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full">
-            <div class="px-6 pt-4 pb-6 space-y-4 shadow-xl">
-                <a href="#how-it-works" class="block text-base font-medium text-slate-600">How it Works</a>
-                <a href="dashboard.html" class="block text-base font-medium text-slate-600">Login</a>
-                <a href="create.html" class="block w-full text-center px-5 py-3 rounded-xl bg-brand-600 text-white font-semibold shadow-md">Create for ₹199</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <main class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center animate-fade-in-up">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-sm font-medium mb-8">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
-                </span>
-                The new standard for invitations
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6 max-w-4xl mx-auto">
-                Celebrate beautifully, <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-blue-600">without the code.</span>
-            </h1>
-            
-            <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Create stunning, bespoke websites for your weddings, birthdays, and special moments in minutes. Share a personalized link that your guests will never forget.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="create.html" class="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 text-white text-lg font-semibold hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-                    Start Creating — ₹199
-                </a>
-                <a href="#demo" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-slate-700 text-lg font-semibold border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all">
-                    View Demo
-                </a>
-            </div>
-            
-            <!-- Hero Graphic Placeholder -->
-            <div class="mt-20 relative max-w-5xl mx-auto reveal-on-scroll">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-50 via-transparent to-transparent z-10"></div>
-                <div class="w-full h-[400px] md:h-[600px] bg-white rounded-t-3xl shadow-2xl border border-slate-200 border-b-0 overflow-hidden relative flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center">
-                     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-                     <div class="relative z-20 text-center text-white">
-                         <h3 class="text-3xl font-serif mb-2">Sarah & James</h3>
-                         <p class="font-light tracking-widest uppercase text-sm">Are getting married</p>
-                     </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Features Section -->
-    <section id="how-it-works" class="py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="text-center mb-16 reveal-on-scroll">
-                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Three steps to perfection.</h2>
-                <p class="text-slate-600 text-lg">No designers, no developers. Just your beautiful moments.</p>
-            </div>
-            
-            <div class="grid md:grid-cols-3 gap-12">
-                <!-- Step 1 -->
-                <div class="text-center reveal-on-scroll" style="transition-delay: 100ms;">
-                    <div class="w-16 h-16 mx-auto bg-brand-50 rounded-2xl flex items-center justify-center mb-6 text-brand-600 shadow-sm border border-brand-100">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">1. Enter Details</h3>
-                    <p class="text-slate-600 leading-relaxed">Input your names, dates, venue details, and personal message in our clean, simple wizard.</p>
-                </div>
-                <!-- Step 2 -->
-                <div class="text-center reveal-on-scroll" style="transition-delay: 200ms;">
-                    <div class="w-16 h-16 mx-auto bg-brand-50 rounded-2xl flex items-center justify-center mb-6 text-brand-600 shadow-sm border border-brand-100">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">2. Choose a Theme</h3>
-                    <p class="text-slate-600 leading-relaxed">Select from our gallery of premium, responsive themes designed for maximum aesthetic impact.</p>
-                </div>
-                <!-- Step 3 -->
-                <div class="text-center reveal-on-scroll" style="transition-delay: 300ms;">
-                    <div class="w-16 h-16 mx-auto bg-brand-50 rounded-2xl flex items-center justify-center mb-6 text-brand-600 shadow-sm border border-brand-100">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">3. Share the Magic</h3>
-                    <p class="text-slate-600 leading-relaxed">Pay a one-time fee of ₹199 and instantly get your custom link to share with family and friends.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-md bg-brand-500 flex items-center justify-center text-white font-bold text-xs">A</div>
-                <span class="font-bold text-xl text-white">Aura</span>
-            </div>
-            <p class="text-sm">© 2026 Aura. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script type="module" src="js/index.js"></script>
 </body>
 </html>
