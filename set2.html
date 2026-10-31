@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTET CBT Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            user-select: none;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Palette Button Shapes - standard CBT styles */
+        .pal-btn {
+            width: 40px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 4px;
+            border-radius: 4px;
+            color: black;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 0: Not Visited */
+        .status-0 { background-color: #f3f4f6; border: 1px solid #d1d5db; }
+        /* 1: Not Answered (Red) */
+        .status-1 { background-color: #ef4444; color: white; border: 1px solid #b91c1c; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;}
+        /* 2: Answered (Green) */
+        .status-2 { background-color: #22c55e; color: white; border: 1px solid #15803d; border-top-left-radius: 12px; border-top-right-radius: 12px;}
+        /* 3: Marked (Purple) */
+        .status-3 { background-color: #a855f7; color: white; border: 1px solid #7e22ce; border-radius: 50%; }
+        /* 4: Answered & Marked (Purple with green dot) */
+        .status-4 { background-color: #a855f7; color: white; border: 1px solid #7e22ce; border-radius: 50%; position: relative;}
+        .status-4::after { content: ''; position: absolute; bottom: 4px; right: 4px; width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; border: 1px solid white;}
+
+        .radio-custom:checked + label {
+            font-weight: 600;
+            color: #1d4ed8;
+        }
+        
+        .radio-custom {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-[#1e3a8a] text-white py-3 px-6 flex justify-between items-center shadow-md shrink-0">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold tracking-wide">JTET Paper 2 (Class 6-8) CBT</h1>
+        </div>
+        <div class="flex items-center gap-8 font-medium">
+            <div class="flex flex-col text-right">
+                <span class="text-sm text-blue-200">Candidate Name</span>
+                <span class="font-bold">Aryaveer Mishra</span>
+            </div>
+            <div class="bg-blue-900 px-4 py-2 rounded shadow-inner border border-blue-800 text-center">
+                <span class="text-sm block text-blue-200 mb-1 leading-none">Time Left</span>
+                <span id="timerDisplay" class="text-xl font-mono font-bold text-yellow-300">150:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div id="mainCbtArea" class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Side: Question Area -->
+        <main class="flex-1 flex flex-col bg-white border-r border-gray-300 relative">
+            
+            <!-- Subject Tabs -->
+            <div id="subjectTabs" class="flex border-b border-gray-300 bg-gray-50 shrink-0 overflow-x-auto">
+                <!-- Tabs will be injected here -->
+            </div>
+
+            <!-- Question Display Box -->
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-700" id="qNumberHeading">Question No. 1</h2>
+                    <span class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded" id="qSubjectBadge">Social Studies</span>
+                </div>
+                
+                <div class="text-lg font-medium text-gray-800 mb-6 leading-relaxed" id="questionText">
+                    <!-- Question goes here -->
+                </div>
+                
+                <div class="flex flex-col gap-4" id="optionsContainer">
+                    <!-- Options go here -->
+                </div>
+            </div>
+
+            <!-- Action Buttons Footer -->
+            <div class="bg-gray-100 p-4 border-t border-gray-300 flex justify-between items-center shrink-0">
+                <div class="flex gap-3">
+                    <button onclick="handleMarkAndNext()" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded font-medium shadow transition-colors text-sm border border-purple-800">Mark for Review & Next</button>
+                    <button onclick="handleClearResponse()" class="bg-white hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded font-medium shadow transition-colors text-sm border border-gray-300">Clear Response</button>
+                    <button onclick="handlePrevious()" class="bg-white hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded font-medium shadow transition-colors text-sm border border-gray-300">Previous</button>
+                </div>
+                <button onclick="handleSaveAndNext()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-2.5 rounded font-bold shadow transition-colors text-sm border border-green-800">Save & Next</button>
+            </div>
+        </main>
+
+        <!-- Right Side: Palette & Panel -->
+        <aside class="w-80 bg-white flex flex-col shrink-0 z-10">
+            <!-- Profile mini -->
+            <div class="p-4 border-b border-gray-200 flex items-center gap-3 bg-blue-50">
+                <div class="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold text-xl border-2 border-blue-400">AM</div>
+                <div>
+                    <div class="text-sm text-gray-500">Roll No:</div>
+                    <div class="font-bold text-gray-800">JTET20268945</div>
+                </div>
+            </div>
+
+            <!-- Status Legend -->
+            <div class="p-4 border-b border-gray-200 grid grid-cols-2 gap-y-3 gap-x-2 text-xs font-medium text-gray-600 bg-gray-50 shrink-0">
+                <div class="flex items-center gap-2"><div class="pal-btn status-2 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-ans">0</div> Answered</div>
+                <div class="flex items-center gap-2"><div class="pal-btn status-1 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-notans">0</div> Not Answered</div>
+                <div class="flex items-center gap-2"><div class="pal-btn status-0 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-notvis">150</div> Not Visited</div>
+                <div class="flex items-center gap-2"><div class="pal-btn status-3 !m-0 !w-6 !h-6 !text-[10px]" id="cnt-marked">0</div> Marked</div>
+            </div>
+
+            <!-- Question Palette -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <h3 class="text-sm font-bold text-gray-700 mb-3" id="paletteTitle">Section: Social Studies</h3>
+                <div class="flex flex-wrap gap-1 justify-start" id="paletteGrid">
+                    <!-- Palette buttons injected here -->
+                </div>
+            </div>
+
+            <!-- Submit Panel -->
+            <div class="p-4 border-t border-gray-300 bg-gray-100 text-center shrink-0">
+                <button onclick="confirmSubmit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow-md transition-colors">Submit Test</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Result Screen (Hidden by default) -->
+    <div id="resultArea" class="hidden flex-1 bg-gray-50 flex items-center justify-center p-6 overflow-y-auto">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-4xl w-full border border-gray-200">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-green-600 mb-2">Test Submitted Successfully!</h2>
+                <p class="text-gray-600">Candidate: <span class="font-bold text-gray-800">Aryaveer Mishra</span> | Roll No: JTET20268945</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
+                    <div class="text-sm text-blue-600 font-bold uppercase tracking-wider">Total Score</div>
+                    <div class="text-4xl font-bold text-blue-800 mt-1" id="resTotalScore">0</div>
+                    <div class="text-xs text-blue-500 mt-1">out of 150</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg border border-green-100 text-center">
+                    <div class="text-sm text-green-600 font-bold uppercase tracking-wider">Attempted</div>
+                    <div class="text-4xl font-bold text-green-800 mt-1" id="resAttempted">0</div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg border border-red-100 text-center">
+                    <div class="text-sm text-red-600 font-bold uppercase tracking-wider">Correct</div>
+                    <div class="text-4xl font-bold text-red-800 mt-1" id="resCorrect">0</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center">
+                    <div class="text-sm text-gray-600 font-bold uppercase tracking-wider">Accuracy</div>
+                    <div class="text-4xl font-bold text-gray-800 mt-1" id="resAccuracy">0%</div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Subject-wise Breakdown</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-sm">
+                            <th class="p-3 border">Subject</th>
+                            <th class="p-3 border text-center">Total Qs</th>
+                            <th class="p-3 border text-center">Attempted</th>
+                            <th class="p-3 border text-center">Correct</th>
+                            <th class="p-3 border text-center">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resTableBody" class="text-sm">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button onclick="location.reload()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded shadow transition-colors">Restart Test</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Submission confirmation / Alerts -->
+    <div id="modalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+            <h3 class="text-xl font-bold text-gray-800 mb-2" id="modalTitle">Confirm Submission</h3>
+            <p class="text-gray-600 mb-6" id="modalText">Are you sure you want to submit the test? You cannot change your answers after submission.</p>
+            <div class="flex justify-end gap-3" id="modalActions">
+                <button onclick="closeModal()" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium">Cancel</button>
+                <button onclick="executeSubmit()" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------------------------------------------------------
+        // 1. DATA: 150 UNIQUE QUESTIONS (Syllabus based)
+        // ---------------------------------------------------------
+        // Subjects:
+        // 0: Social Studies (60) - Hindi
+        // 1: Nagpuri (30) - Devanagari
+        // 2: Computer (30) - Hindi
+        // 3: Hindi (15) - Hindi
+        // 4: English (15) - English
+
+        const subjectsData = [
+            { id: 0, name: "सामाजिक विज्ञान (Social Studies)", code: "SS", count: 60, start: 0, end: 59 },
+            { id: 1, name: "नागपुरी (Nagpuri)", code: "NAG", count: 30, start: 60, end: 89 },
+            { id: 2, name: "कंप्यूटर (Computer)", code: "COMP", count: 30, start: 90, end: 119 },
+            { id: 3, name: "हिंदी (Hindi)", code: "HIN", count: 15, start: 120, end: 134 },
+            { id: 4, name: "English", code: "ENG", count: 15, start: 135, end: 149 }
+        ];
+
+        // Format: { q: "Question", o: ["A", "B", "C", "D"], a: 0 (Correct index), s: 0 (Subject ID) }
+        const questions = [
+            // --- SOCIAL STUDIES (60 Qs) ---
+            { q: "झारखण्ड का शिमला किसे कहा जाता है?", o: ["हजारीबाग", "नेतरहाट", "रांची", "बोकारो"], a: 2, s: 0 },
+            { q: "स्वतंत्र भारत के प्रथम गवर्नर जनरल कौन थे?", o: ["लॉर्ड माउंटबेटन", "सी. राजगोपालाचारी", "डॉ. राजेंद्र प्रसाद", "लॉर्ड कैनिंग"], a: 0, s: 0 },
+            { q: "झारखण्ड में अभ्रक (Mica) की राजधानी किसे कहा जाता है?", o: ["गिरिडीह", "कोडरमा", "धनबाद", "चतरा"], a: 1, s: 0 },
+            { q: "संविधान के किस भाग में मौलिक कर्तव्यों का उल्लेख है?", o: ["भाग III", "भाग IV", "भाग IV (क)", "भाग V"], a: 2, s: 0 },
+            { q: "सभ्यता का पालना किस महाद्वीप को कहा जाता है?", o: ["एशिया", "अफ्रीका", "यूरोप", "ऑस्ट्रेलिया"], a: 0, s: 0 },
+            { q: "झारखण्ड का सबसे बड़ा वन क्षेत्र किस जिले में है?", o: ["पश्चिमी सिंहभूम", "पलामू", "चतरा", "हजारीबाग"], a: 0, s: 0 },
+            { q: "बुद्ध ने सर्वाधिक उपदेश कहाँ दिए थे?", o: ["सारनाथ", "श्रावस्ती", "राजगृह", "वैशाली"], a: 1, s: 0 },
+            { q: "भारत में हरित क्रांति के जनक कौन माने जाते हैं?", o: ["नॉर्मन बोरलॉग", "एम. एस. स्वामीनाथन", "वर्गीज कुरियन", "सैम पित्रोदा"], a: 1, s: 0 },
+            { q: "झारखण्ड की स्वर्णरेखा नदी कहाँ गिरती है?", o: ["बंगाल की खाड़ी", "अरब सागर", "गंगा नदी", "हुगली नदी"], a: 0, s: 0 },
+            { q: "सिकंदर ने भारत पर कब आक्रमण किया था?", o: ["326 ईसा पूर्व", "323 ईसा पूर्व", "261 ईसा पूर्व", "298 ईसा पूर्व"], a: 0, s: 0 },
+            { q: "राष्ट्रपति पद के उम्मीदवार के लिए न्यूनतम आयु क्या है?", o: ["25 वर्ष", "30 वर्ष", "35 वर्ष", "40 वर्ष"], a: 2, s: 0 },
+            { q: "विश्व की सबसे गहरी झील कौन सी है?", o: ["कैस्पियन सागर", "सुपीरियर झील", "बैकाल झील", "विक्टोरिया झील"], a: 2, s: 0 },
+            { q: "हुंडरू जलप्रपात किस नदी पर स्थित है?", o: ["दामोदर", "स्वर्णरेखा", "शंख", "दक्षिणी कोयल"], a: 1, s: 0 },
+            { q: "महात्मा गांधी ने दांडी मार्च कहाँ से शुरू किया था?", o: ["पोरबंदर", "साबरमती आश्रम", "वर्धा", "चंपारण"], a: 1, s: 0 },
+            { q: "नीति आयोग (NITI Aayog) के अध्यक्ष कौन होते हैं?", o: ["वित्त मंत्री", "राष्ट्रपति", "प्रधानमंत्री", "गृह मंत्री"], a: 2, s: 0 },
+            { q: "भारत की सबसे बड़ी मीठे पानी की झील कौन सी है?", o: ["डल झील", "वुलर झील", "चिल्का झील", "सांभर झील"], a: 1, s: 0 },
+            { q: "बेतला राष्ट्रीय उद्यान झारखण्ड के किस जिले में है?", o: ["पलामू", "लातेहार", "गढ़वा", "गुमला"], a: 1, s: 0 },
+            { q: "पानीपत का द्वितीय युद्ध कब हुआ था?", o: ["1526", "1556", "1761", "1576"], a: 1, s: 0 },
+            { q: "संसद के दो सत्रों के बीच अधिकतम कितना अंतर हो सकता है?", o: ["3 महीने", "4 महीने", "6 महीने", "1 वर्ष"], a: 2, s: 0 },
+            { q: "विश्व जनसंख्या दिवस कब मनाया जाता है?", o: ["11 जुलाई", "5 जून", "8 मार्च", "1 दिसंबर"], a: 0, s: 0 },
+            { q: "चुआर विद्रोह का नेतृत्व किसने किया था?", o: ["दुर्जन सिंह", "रघुनाथ महतो", "तिलका मांझी", "जगन्नाथ ढाल"], a: 1, s: 0 },
+            { q: "खालसा पंथ की स्थापना किसने की थी?", o: ["गुरु नानक देव", "गुरु गोबिंद सिंह", "गुरु अर्जुन देव", "गुरु तेग बहादुर"], a: 1, s: 0 },
+            { q: "भारतीय रिज़र्व बैंक (RBI) का राष्ट्रीयकरण कब हुआ था?", o: ["1935", "1947", "1949", "1955"], a: 2, s: 0 },
+            { q: "सदाबहार वन भारत में कहाँ पाए जाते हैं?", o: ["पश्चिमी घाट", "पूर्वी घाट", "अरावली", "विंध्याचल"], a: 0, s: 0 },
+            { q: "मैथन डैम किस नदी पर स्थित है?", o: ["दामोदर", "बराकर", "कोनार", "बोकारो"], a: 1, s: 0 },
+            { q: "दीन-ए-इलाही धर्म किसने चलाया था?", o: ["बाबर", "अकबर", "जहाँगीर", "शाहजहाँ"], a: 1, s: 0 },
+            { q: "राज्य के नीति निदेशक तत्व किस देश के संविधान से लिए गए हैं?", o: ["अमेरिका", "आयरलैंड", "रूस", "ब्रिटेन"], a: 1, s: 0 },
+            { q: "कपास की खेती के लिए सबसे उपयुक्त मिट्टी कौन सी है?", o: ["जलोढ़", "काली", "लाल", "लेटराइट"], a: 1, s: 0 },
+            { q: "झारखण्ड का सबसे ठंडा स्थान कौन सा है?", o: ["रांची", "नेतरहाट", "हजारीबाग", "पारसनाथ"], a: 1, s: 0 },
+            { q: "सविनय अवज्ञा आंदोलन किस वर्ष प्रारंभ हुआ?", o: ["1920", "1930", "1942", "1919"], a: 1, s: 0 },
+            { q: "संविधान के किस अनुच्छेद में वित्त आयोग का प्रावधान है?", o: ["अनुच्छेद 280", "अनुच्छेद 324", "अनुच्छेद 356", "अनुच्छेद 370"], a: 0, s: 0 },
+            { q: "भारत का सबसे ऊँचा बांध कौन सा है?", o: ["भाखड़ा नांगल", "टिहरी", "हीराकुंड", "सरदार सरोवर"], a: 1, s: 0 },
+            { q: "झारखण्ड में यूरेनियम की खान कहाँ स्थित है?", o: ["जादूगोड़ा", "झरिया", "नोवामुंडी", "घाटशिला"], a: 0, s: 0 },
+            { q: "विजयनगर साम्राज्य के संस्थापक कौन थे?", o: ["हरिहर और बुक्का", "कृष्णदेव राय", "शिवाजी", "बहमनी शाह"], a: 0, s: 0 },
+            { q: "भारतीय संविधान में कुल कितनी अनुसूचियाँ हैं?", o: ["8", "10", "12", "14"], a: 2, s: 0 },
+            { q: "भूमध्य रेखा के निकट कौन सा वन पाया जाता है?", o: ["उष्णकटिबंधीय वर्षा वन", "शंकुधारी वन", "पतझड़ वन", "टुंड्रा"], a: 0, s: 0 },
+            { q: "झारखण्ड के प्रथम मुख्यमंत्री कौन थे?", o: ["शिबू सोरेन", "अर्जुन मुंडा", "बाबूलाल मरांडी", "मधु कोड़ा"], a: 2, s: 0 },
+            { q: "रामकृष्ण मिशन की स्थापना किसने की?", o: ["राजा राममोहन राय", "स्वामी दयानंद", "स्वामी विवेकानंद", "ईश्वर चंद्र विद्यासागर"], a: 2, s: 0 },
+            { q: "संसद का उच्च सदन कौन सा होता है?", o: ["लोकसभा", "राज्यसभा", "विधानसभा", "विधान परिषद"], a: 1, s: 0 },
+            { q: "सौरमंडल का सबसे बड़ा ग्रह कौन सा है?", o: ["पृथ्वी", "मंगल", "बृहस्पति", "शनि"], a: 2, s: 0 },
+            { q: "झारखण्ड में पहली रेलगाड़ी कब चली थी?", o: ["1853", "1862", "1890", "1905"], a: 1, s: 0 }, // Howrah to Rajmahal roughly
+            { q: "गदर पार्टी के संस्थापक कौन थे?", o: ["लाला हरदयाल", "भगत सिंह", "सुभाष चंद्र बोस", "चन्द्रशेखर आज़ाद"], a: 0, s: 0 },
+            { q: "पंचायती राज संस्थाओं का कार्यकाल कितना होता है?", o: ["4 वर्ष", "5 वर्ष", "6 वर्ष", "3 वर्ष"], a: 1, s: 0 },
+            { q: "भारत में सबसे अधिक चाय उत्पादन करने वाला राज्य कौन सा है?", o: ["पश्चिम बंगाल", "असम", "केरल", "तमिलनाडु"], a: 1, s: 0 },
+            { q: "देवघर स्थित शिव मंदिर का निर्माण किसने करवाया था?", o: ["राजा पूरणमल", "राजा मानसिंह", "फणी मुकुट राय", "मेदनी राय"], a: 0, s: 0 },
+            { q: "रोलैट एक्ट कब पारित हुआ था?", o: ["1917", "1919", "1920", "1922"], a: 1, s: 0 },
+            { q: "मुख्यमंत्री की नियुक्ति कौन करता है?", o: ["प्रधानमंत्री", "राष्ट्रपति", "राज्यपाल", "मुख्य न्यायाधीश"], a: 2, s: 0 },
+            { q: "पृथ्वी के कितने प्रतिशत भाग पर जल है?", o: ["50%", "60%", "71%", "80%"], a: 2, s: 0 },
+            { q: "झारखण्ड की सबसे बड़ी जनजाति कौन सी है?", o: ["उरांव", "मुंडा", "संथाल", "हो"], a: 2, s: 0 },
+            { q: "गुप्त वंश का संस्थापक कौन था?", o: ["चंद्रगुप्त प्रथम", "समुद्रगुप्त", "श्रीगुप्त", "कुमारगुप्त"], a: 2, s: 0 },
+            { q: "लोकसभा का सदस्य बनने के लिए न्यूनतम आयु क्या है?", o: ["21 वर्ष", "25 वर्ष", "30 वर्ष", "35 वर्ष"], a: 1, s: 0 },
+            { q: "भारत और चीन के बीच की सीमा रेखा क्या कहलाती है?", o: ["रेडक्लिफ रेखा", "मैकमोहन रेखा", "डूरंड रेखा", "मैगिनॉट रेखा"], a: 1, s: 0 },
+            { q: "झारखण्ड में पाइका क्या है?", o: ["नृत्य", "गीत", "चित्रकला", "वाद्ययंत्र"], a: 0, s: 0 },
+            { q: "कैबिनेट मिशन भारत कब आया?", o: ["1942", "1945", "1946", "1947"], a: 2, s: 0 },
+            { q: "संविधान की कुंजी किसे कहा जाता है?", o: ["मौलिक अधिकारों को", "प्रस्तावना को", "नीति निदेशक तत्वों को", "अनुच्छेद 32 को"], a: 1, s: 0 },
+            { q: "मानस राष्ट्रीय उद्यान किस राज्य में स्थित है?", o: ["असम", "मध्य प्रदेश", "राजस्थान", "उत्तराखंड"], a: 0, s: 0 },
+            { q: "पारसनाथ किस धर्म का प्रमुख तीर्थ स्थल है?", o: ["हिन्दू", "जैन", "बौद्ध", "सिख"], a: 1, s: 0 },
+            { q: "हड़प्पा किस नदी के किनारे स्थित है?", o: ["सिंधु", "रावी", "सतलज", "घग्गर"], a: 1, s: 0 },
+            { q: "भारत का प्रथम नागरिक कौन होता है?", o: ["प्रधानमंत्री", "मुख्य न्यायाधीश", "राष्ट्रपति", "लोकसभा अध्यक्ष"], a: 2, s: 0 },
+            { q: "वायुमंडल की सबसे निचली परत कौन सी है?", o: ["समताप मंडल", "क्षोभ मंडल", "मध्य मंडल", "आयन मंडल"], a: 1, s: 0 },
+
+            // --- NAGPURI (30 Qs) ---
+            { q: "नागपुरी साहित्य में 'उदासी' गीत कखन गावल जायला?", o: ["फगुआ में", "जेठ-बइसाख कर गरमी में", "सावन में", "जाड़ में"], a: 1, s: 1 },
+            { q: "'छोटका' कर उल्टा शब्द नागपुरी में का होवी?", o: ["बड़का", "मंझला", "ननकु", "सझला"], a: 0, s: 1 },
+            { q: "नागपुरी में 'बाघ' कर बहुवचन का होवेला?", o: ["बाघमन", "बाघसब", "बाघी", "बाघलोक"], a: 0, s: 1 },
+            { q: "डॉ. बी. पी. केशरी कर लिखल किताब कर का नाम हेके?", o: ["नागपुरी कवि और उनका काव्य", "नागपुरी व्याकरण", "नागपुरी फाग शतक", "नागपुरी लोक साहित्य"], a: 0, s: 1 },
+            { q: "'माय' कर पर्यायवाची शब्द का होला?", o: ["बाप", "आयो / दीदी", "आयो", "भउजी"], a: 2, s: 1 },
+            { q: "सरहुल परब कइ दिन तक मनाल जायला?", o: ["एके दिन", "दुइ दिन", "तीन दिन", "चार दिन"], a: 2, s: 1 }, // Generally 3-4 days rituals
+            { q: "नागपुरी भाषा कर लिपिक का हेके?", o: ["रोमन", "ओलचिकी", "देवनागरी", "ब्राह्मी"], a: 2, s: 1 },
+            { q: "'नदी' के नागपुरी में का कहेना?", o: ["नदी", "दरिया", "खरिया", "गड़हा / नदी"], a: 0, s: 1 }, // Often just naddi or nadi
+            { q: "नागपुरी में कइ गो कारक होला?", o: ["6", "7", "8", "9"], a: 2, s: 1 },
+            { q: "डमकच का हेके?", o: ["खेलेक चीज", "लोकगीत / नाच", "खायक चीज", "गाछ"], a: 1, s: 1 },
+            { q: "'बिहा' कर माने का होला?", o: ["जन्म", "मरनी", "शादी", "पूजा"], a: 2, s: 1 },
+            { q: "नागपुरी में 'तोय' केकर ले प्रयोग होला?", o: ["आदर ले", "छोट ले", "बराबर ले", "छोट और बराबर ले"], a: 3, s: 1 },
+            { q: "'गोतिया' कर माने का होला?", o: ["दुश्मन", "दोस्त", "रिश्तेदार / कुटूम", "पड़ोसी"], a: 2, s: 1 },
+            { q: "करम परब में केकर डाइल गड़ल जायला?", o: ["सखुआ", "पीपर", "करम", "नीम"], a: 2, s: 1 },
+            { q: "नागपुरी में 'हाँ' के और का कहेना?", o: ["हँ", "ना", "हे", "हो"], a: 0, s: 1 },
+            { q: "'कुकुर' कर स्त्रीलिंग का होवी?", o: ["कुत्ता", "कुकुरी", "कुतनी", "कुकुरनी"], a: 1, s: 1 },
+            { q: "फगुआ गीत में केकर गुणगान बेसी होला?", o: ["राम-सीता", "राधा-कृष्ण", "शिव-पार्वती", "गणेश"], a: 1, s: 1 },
+            { q: "'पानी' कर पर्यायवाची नागपुरी में का होला?", o: ["जल", "नीर", "पानी", "ई सब"], a: 3, s: 1 },
+            { q: "सोहराई परब कहिया मनाल जायला?", o: ["कार्तिक अमावस्या", "चैत नवमी", "भादो एकादशी", "माघ पूर्णिमा"], a: 0, s: 1 },
+            { q: "नागपुरी लोककथा में 'अहीर' कर का काम होला?", o: ["खेती", "गाय-गरु चरायेक", "पूजा करेक", "लोहा पीटेक"], a: 1, s: 1 },
+            { q: "नागपुरी में 'आपन' कर उल्टा का होला?", o: ["पराया / बिरान", "हमर", "तोहर", "अपन"], a: 0, s: 1 },
+            { q: "'मुँह' के नागपुरी में का कहेना?", o: ["थुथुन", "मुँह", "चेहरा", "आन"], a: 1, s: 1 }, // Generally 'thuthun' is snout, face is 'muh' or 'thora'
+            { q: "संज्ञा कर कइ गो भेद नागपुरी में मानल जायला?", o: ["तीन", "चार", "पाँच", "छह"], a: 2, s: 1 },
+            { q: "'खाइसी' कर माने का होला?", o: ["खायेगा", "खायी थी", "खायेगी (स्त्रीलिंग भविष्यत)", "खाता है"], a: 0, s: 1 }, // Khaisi is he/she will eat
+            { q: "नागपुरी में 'हाथ' के का कहेना?", o: ["हाथ", "गोड़", "मूँड़", "आँख"], a: 0, s: 1 },
+            { q: "पावस गीत कहिया गावल जायला?", o: ["गरमी में", "बरखा (बरसात) में", "जाड़ में", "बसंत में"], a: 1, s: 1 },
+            { q: "'उठेक' कर उल्टा का होवी?", o: ["जागेक", "बइठेक", "सुतेक", "दउड़ेक"], a: 1, s: 1 },
+            { q: "झारखंड कर कुन भाषा सबसे बेसी बोलल जायला (सदानी में)?", o: ["खोरठा", "नागपुरी", "कुरमाली", "पंचपरगनिया"], a: 0, s: 1 }, // Shorha is most spoken overall, Nagpuri is second. Let's make it Nagpuri in its own area.
+            { q: "'लूर' कर माने का होला?", o: ["बुद्धि / शऊर", "पैसा", "ताकत", "सुंदरता"], a: 0, s: 1 },
+            { q: "नागपुरी में 'सावन' के का कहेना?", o: ["सावन", "साओन", "भादो", "चैत"], a: 1, s: 1 },
+
+            // --- COMPUTER (30 Qs) ---
+            { q: "कंप्यूटर में डेटा की सबसे छोटी इकाई क्या है?", o: ["बाइट", "बिट", "निबल", "किलोबाइट"], a: 1, s: 2 },
+            { q: "इनमें से कौन सा एक आउटपुट डिवाइस है?", o: ["माउस", "कीबोर्ड", "स्कैनर", "प्रिंटर"], a: 3, s: 2 },
+            { q: "ROM का पूर्ण रूप क्या है?", o: ["Read Only Memory", "Random Only Memory", "Run On Memory", "Read Once Memory"], a: 0, s: 2 },
+            { q: "ऑपरेटिंग सिस्टम किस प्रकार का सॉफ्टवेयर है?", o: ["एप्लीकेशन सॉफ्टवेयर", "सिस्टम सॉफ्टवेयर", "यूटिलिटी सॉफ्टवेयर", "कस्टम सॉफ्टवेयर"], a: 1, s: 2 },
+            { q: "HTTP का पूर्ण रूप क्या है?", o: ["Hyper Text Transfer Protocol", "High Text Transfer Protocol", "Hyper Transfer Text Protocol", "Hyper Text Transit Protocol"], a: 0, s: 2 },
+            { q: "कॉपी (Copy) करने की शॉर्टकट कुंजी क्या है?", o: ["Ctrl + V", "Ctrl + P", "Ctrl + C", "Ctrl + X"], a: 2, s: 2 },
+            { q: "ALU का पूर्ण रूप क्या है?", o: ["Arithmetic Logic Unit", "Array Logic Unit", "Application Logic Unit", "Arithmetic Local Unit"], a: 0, s: 2 },
+            { q: "1 गीगाबाइट (GB) में कितने मेगाबाइट (MB) होते हैं?", o: ["1000", "1024", "1048", "512"], a: 1, s: 2 },
+            { q: "कंप्यूटर का मस्तिष्क किसे कहा जाता है?", o: ["RAM", "ROM", "CPU", "Motherboard"], a: 2, s: 2 },
+            { q: "इनमें से कौन सा सर्च इंजन (Search Engine) नहीं है?", o: ["Google", "Bing", "Yahoo", "Chrome"], a: 3, s: 2 },
+            { q: "वेबसाइट के पहले पेज को क्या कहा जाता है?", o: ["होम पेज", "मेन पेज", "इंडेक्स पेज", "फर्स्ट पेज"], a: 0, s: 2 },
+            { q: "Wi-Fi का फुल फॉर्म क्या है?", o: ["Wireless File", "Wireless Fidelity", "Wired Fidelity", "Wireless Feature"], a: 1, s: 2 },
+            { q: "MS Word में किसी भी टेक्स्ट को बोल्ड (Bold) करने की शॉर्टकट कुंजी क्या है?", o: ["Ctrl + U", "Ctrl + I", "Ctrl + B", "Ctrl + S"], a: 2, s: 2 },
+            { q: "ईमेल पते में '@' से पहले वाले हिस्से को क्या कहते हैं?", o: ["डोमेन नेम", "यूजर नेम", "वेबसाइट नेम", "पासवर्ड"], a: 1, s: 2 },
+            { q: "कंप्यूटर नेटवर्क में LAN का पूर्ण रूप क्या है?", o: ["Local Area Network", "Logical Area Network", "Large Area Network", "Local Access Network"], a: 0, s: 2 },
+            { q: "वायरसों (Viruses) से कंप्यूटर को बचाने के लिए किस सॉफ्टवेयर का उपयोग किया जाता है?", o: ["कम्पाइलर", "एंटीवायरस", "ब्राउज़र", "फायरवॉल"], a: 1, s: 2 },
+            { q: "डेटा को सेव (Save) करने की शॉर्टकट कुंजी क्या है?", o: ["Ctrl + C", "Ctrl + V", "Ctrl + S", "Ctrl + P"], a: 2, s: 2 },
+            { q: "GUI का पूर्ण रूप क्या है?", o: ["Graphical User Interface", "General Utility Interface", "Graphic Universal Interface", "General User Interface"], a: 0, s: 2 },
+            { q: "कंप्यूटर को बंद करने की प्रक्रिया को क्या कहते हैं?", o: ["बूटिंग", "रीस्टार्ट", "शटडाउन", "स्लीप"], a: 2, s: 2 },
+            { q: "इनमें से कौन सा स्प्रेडशीट सॉफ्टवेयर है?", o: ["MS Word", "MS Excel", "MS PowerPoint", "MS Access"], a: 1, s: 2 },
+            { q: "IP एड्रेस का पूर्ण रूप क्या है?", o: ["Internet Provider", "Internet Protocol", "Internal Protocol", "International Protocol"], a: 1, s: 2 },
+            { q: "अंडू (Undo) करने के लिए किस शॉर्टकट कुंजी का उपयोग किया जाता है?", o: ["Ctrl + Z", "Ctrl + Y", "Ctrl + X", "Ctrl + U"], a: 0, s: 2 },
+            { q: "URL का पूर्ण रूप क्या है?", o: ["Uniform Resource Locator", "Universal Resource Locator", "Unique Resource Locator", "Universal Routing Locator"], a: 0, s: 2 },
+            { q: "पीडीएफ (PDF) का पूर्ण रूप क्या है?", o: ["Portable Document Format", "Printed Document Format", "Public Document File", "Portable Data Format"], a: 0, s: 2 },
+            { q: "कीबोर्ड की F5 कुंजी (Key) का मुख्य उपयोग क्या है?", o: ["सेव", "रिफ्रेश", "प्रिंट", "सर्च"], a: 1, s: 2 },
+            { q: "मॉडेम (Modem) का फुल फॉर्म क्या है?", o: ["Modulator Demodulator", "Modern Machine", "Mobile Device", "Model Demodel"], a: 0, s: 2 },
+            { q: "सॉफ्टवेयर के त्रुटियों (Bugs) को ढूँढने और ठीक करने की प्रक्रिया को क्या कहते हैं?", o: ["कम्पाइलिंग", "डीबगिंग", "रनिंग", "टेस्टिंग"], a: 1, s: 2 },
+            { q: "USB का पूर्ण रूप क्या है?", o: ["Universal Serial Bus", "Uniform Serial Bus", "Unique Serial Bus", "Universal System Bus"], a: 0, s: 2 },
+            { q: "कम्पाइलर (Compiler) का क्या कार्य है?", o: ["हाई लेवल लैंग्वेज को मशीन लैंग्वेज में बदलना", "मशीन लैंग्वेज को हाई लेवल लैंग्वेज में बदलना", "हार्डवेयर कंट्रोल करना", "डेटा सेव करना"], a: 0, s: 2 },
+            { q: "MS PowerPoint में नई स्लाइड जोड़ने की शॉर्टकट कुंजी क्या है?", o: ["Ctrl + N", "Ctrl + M", "Ctrl + S", "Ctrl + K"], a: 1, s: 2 },
+
+            // --- HINDI (15 Qs) ---
+            { q: "हिन्दी दिवस कब मनाया जाता है?", o: ["14 सितंबर", "5 सितंबर", "2 अक्टूबर", "15 अगस्त"], a: 0, s: 3 },
+            { q: "‘पवन’ का सही संधि विच्छेद क्या है?", o: ["पव + अन", "पो + अन", "पौ + अन", "प + वन"], a: 1, s: 3 },
+            { q: "‘दशानन’ में कौन सा समास है?", o: ["तत्पुरुष", "कर्मधारय", "बहुव्रीहि", "द्विगु"], a: 2, s: 3 },
+            { q: "‘गणेश’ का पर्यायवाची शब्द नहीं है:", o: ["गजानन", "लंबोदर", "विनायक", "दिनेश"], a: 3, s: 3 },
+            { q: "‘अंधकार’ का विलोम शब्द क्या है?", o: ["प्रकाश", "रात", "उजाला", "रोशनी"], a: 0, s: 3 },
+            { q: "‘जो सब कुछ जानता हो’ के लिए एक शब्द क्या होगा?", o: ["अज्ञानी", "सर्वज्ञ", "बहुज्ञ", "अल्पज्ञ"], a: 1, s: 3 },
+            { q: "‘आग बबूला होना’ मुहावरे का अर्थ है:", o: ["बहुत खुश होना", "बहुत क्रोधित होना", "आग जलाना", "डर जाना"], a: 1, s: 3 },
+            { q: "इनमें से शुद्ध वाक्य छाँटिए:", o: ["राम ने पुस्तक पढ़ा।", "राम पुस्तक पढ़ी।", "राम ने पुस्तक पढ़ी।", "राम पुस्तक पढ़ा।"], a: 2, s: 3 },
+            { q: "‘कवि’ का स्त्रीलिंग शब्द क्या होगा?", o: ["कवित्री", "कविनी", "कवयित्री", "कवयत्री"], a: 2, s: 3 },
+            { q: "‘राजा’ का बहुवचन क्या होगा?", o: ["राजायें", "राजाओं", "राजा", "राजान"], a: 2, s: 3 }, // Raja remains Raja in direct plural, oblique is Rajaon
+            { q: "‘य, र, ल, व’ व्यंजनों को क्या कहते हैं?", o: ["ऊष्म व्यंजन", "अंतःस्थ व्यंजन", "स्पर्श व्यंजन", "संयुक्त व्यंजन"], a: 1, s: 3 },
+            { q: "‘उत्कर्ष’ का विलोम शब्द है:", o: ["पतन", "अपकर्ष", "विकर्ष", "निष्कर्ष"], a: 1, s: 3 },
+            { q: "‘हाथ मलना’ मुहावरे का अर्थ है:", o: ["हाथ साफ़ करना", "पछताना", "सर्दी लगना", "व्यायाम करना"], a: 1, s: 3 },
+            { q: "शोक किस रस का स्थायी भाव है?", o: ["वीर रस", "शृंगार रस", "करुण रस", "हास्य रस"], a: 2, s: 3 },
+            { q: "‘चौराहा’ में कौन सा समास है?", o: ["द्वंद्व", "द्विगु", "अव्ययीभाव", "तत्पुरुष"], a: 1, s: 3 },
+
+            // --- ENGLISH (15 Qs) ---
+            { q: "Identify the correctly spelt word.", o: ["Accomodation", "Accommodation", "Acommodation", "Accomodation"], a: 1, s: 4 },
+            { q: "What is the synonym of 'Abundant'?", o: ["Scarce", "Plentiful", "Rare", "Short"], a: 1, s: 4 },
+            { q: "Choose the antonym of 'Brave'.", o: ["Courageous", "Bold", "Cowardly", "Heroic"], a: 2, s: 4 },
+            { q: "Fill in the blank with suitable article: 'She is _____ European.'", o: ["a", "an", "the", "no article"], a: 0, s: 4 },
+            { q: "Select the correct preposition: 'He is afraid _____ dogs.'", o: ["from", "by", "of", "with"], a: 2, s: 4 },
+            { q: "Change into passive voice: 'She is singing a song.'", o: ["A song is sung by her.", "A song was being sung by her.", "A song is being sung by her.", "She sings a song."], a: 2, s: 4 },
+            { q: "Choose the correct verb: 'Neither John nor his friends _____ present.'", o: ["is", "are", "was", "has"], a: 1, s: 4 },
+            { q: "Meaning of the idiom 'To bite the dust':", o: ["To eat dirt", "To be defeated or die", "To clean the house", "To become angry"], a: 1, s: 4 },
+            { q: "A person who writes a book is called an:", o: ["Editor", "Publisher", "Author", "Reader"], a: 2, s: 4 },
+            { q: "What is the plural of 'Mouse'?", o: ["Mouses", "Mice", "Mices", "Mouse"], a: 1, s: 4 },
+            { q: "Identify the tense: 'I had completed my work.'", o: ["Past Perfect", "Past Continuous", "Present Perfect", "Simple Past"], a: 0, s: 4 },
+            { q: "Find the error in the sentence: 'One of the boy is missing.'", o: ["One", "of the", "boy", "is missing"], a: 2, s: 4 }, // Should be 'boys'
+            { q: "What is the feminine gender of 'Horse'?", o: ["Mare", "Doe", "Ewe", "Cow"], a: 0, s: 4 },
+            { q: "Fill in the blank: 'He _____ to school every day.'", o: ["go", "going", "goes", "gone"], a: 2, s: 4 },
+            { q: "The comparative degree of 'Far' is:", o: ["Farther", "Farest", "More far", "Most far"], a: 0, s: 4 }
+        ];
+
+        // ---------------------------------------------------------
+        // 2. STATE VARIABLES
+        // ---------------------------------------------------------
+        const TOTAL_QUESTIONS = questions.length; // Should be 150
+        let currentQuestionIndex = 0;
+        let activeSubjectId = 0;
+        
+        // 0: Not Visited, 1: Not Answered, 2: Answered, 3: Marked, 4: Answered & Marked
+        let questionStatuses = new Array(TOTAL_QUESTIONS).fill(0); 
+        
+        // Store user answers (-1 means no answer)
+        let userAnswers = new Array(TOTAL_QUESTIONS).fill(-1); 
+        
+        // Timer (150 minutes = 9000 seconds)
+        let timeLeft = 150 * 60; 
+        let timerInterval;
+
+        // Ensure Question 0 is set to Not Answered initially (since it's visited)
+        questionStatuses[0] = 1;
+
+        // ---------------------------------------------------------
+        // 3. INITIALIZATION & UI RENDERING
+        // ---------------------------------------------------------
+        document.addEventListener("DOMContentLoaded", () => {
+            initSubjectTabs();
+            renderPalette();
+            loadQuestion(0);
+            updateLegendCounters();
+            startTimer();
+        });
+
+        function initSubjectTabs() {
+            const tabsContainer = document.getElementById("subjectTabs");
+            tabsContainer.innerHTML = "";
+            subjectsData.forEach((sub, idx) => {
+                const btn = document.createElement("button");
+                btn.className = `px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-4 transition-colors ${idx === activeSubjectId ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent text-gray-600 hover:text-blue-500 hover:bg-gray-100'}`;
+                btn.textContent = `${sub.name} (${sub.count})`;
+                btn.onclick = () => {
+                    activeSubjectId = idx;
+                    initSubjectTabs(); // re-render to update active state
+                    renderPalette();
+                    // Jump to first question of this subject
+                    jumpToQuestion(sub.start);
+                };
+                tabsContainer.appendChild(btn);
+            });
+            document.getElementById("paletteTitle").textContent = `Section: ${subjectsData[activeSubjectId].name}`;
+        }
+
+        function renderPalette() {
+            const grid = document.getElementById("paletteGrid");
+            grid.innerHTML = "";
+            
+            const currentSub = subjectsData[activeSubjectId];
+            
+            for (let i = currentSub.start; i <= currentSub.end; i++) {
+                const btn = document.createElement("div");
+                // The status determines the CSS class
+                let statusClass = `status-${questionStatuses[i]}`;
+                
+                // If it's the currently active question, give it a highlight
+                let borderHighlight = i === currentQuestionIndex ? "ring-2 ring-blue-500 ring-offset-1 scale-110 z-10" : "";
+                
+                btn.className = `pal-btn ${statusClass} ${borderHighlight}`;
+                btn.textContent = (i + 1);
+                btn.onclick = () => jumpToQuestion(i);
+                grid.appendChild(btn);
+            }
+        }
+
+        function updateLegendCounters() {
+            let counts = {0:0, 1:0, 2:0, 3:0, 4:0};
+            questionStatuses.forEach(s => counts[s]++);
+            
+            document.getElementById("cnt-notvis").textContent = counts[0];
+            document.getElementById("cnt-notans").textContent = counts[1];
+            document.getElementById("cnt-ans").textContent = counts[2] + counts[4]; // Combine answered & answered+marked for standard display
+            document.getElementById("cnt-marked").textContent = counts[3] + counts[4];
+        }
+
+        // ---------------------------------------------------------
+        // 4. QUESTION NAVIGATION & LOGIC
+        // ---------------------------------------------------------
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questions[index];
+            
+            // Auto-switch subject tab if navigating crosses boundaries
+            if (q.s !== activeSubjectId) {
+                activeSubjectId = q.s;
+                initSubjectTabs();
+                renderPalette();
+            }
+
+            // Update Status (if not visited, make it not answered)
+            if (questionStatuses[index] === 0) {
+                questionStatuses[index] = 1;
+            }
+
+            // Update UI Elements
+            document.getElementById("qNumberHeading").textContent = `Question No. ${index + 1}`;
+            document.getElementById("qSubjectBadge").textContent = subjectsData[q.s].name;
+            document.getElementById("questionText").textContent = q.q;
+
+            // Render Options
+            const optionsContainer = document.getElementById("optionsContainer");
+            optionsContainer.innerHTML = "";
+            
+            q.o.forEach((optText, optIdx) => {
+                const label = document.createElement("label");
+                label.className = "flex items-start p-3 border border-gray-200 rounded cursor-pointer hover:bg-blue-50 transition-colors bg-white";
+                
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "currentQuestionOpt";
+                radio.value = optIdx;
+                radio.className = "radio-custom mt-1 mr-3";
+                
+                // Restore previous answer if exists
+                if (userAnswers[index] === optIdx) {
+                    radio.checked = true;
+                    label.classList.add("border-blue-500", "bg-blue-50");
+                }
+
+                radio.onchange = () => {
+                    // Visual update for checked state
+                    document.querySelectorAll('label').forEach(l => {
+                        l.classList.remove("border-blue-500", "bg-blue-50");
+                    });
+                    label.classList.add("border-blue-500", "bg-blue-50");
+                };
+
+                const textSpan = document.createElement("span");
+                textSpan.className = "text-base text-gray-700 select-none";
+                textSpan.textContent = optText;
+
+                label.appendChild(radio);
+                label.appendChild(textSpan);
+                optionsContainer.appendChild(label);
+            });
+
+            // Re-render palette to show highlighting and status changes
+            renderPalette();
+            updateLegendCounters();
+        }
+
+        function getSelectedOption() {
+            const selected = document.querySelector('input[name="currentQuestionOpt"]:checked');
+            return selected ? parseInt(selected.value) : -1;
+        }
+
+        function jumpToQuestion(index) {
+            // Save current state implicitly? No, usually in CBT, jumping without 'Save' might not save in some systems, but modern systems auto-save.
+            // TCS iON requires explicitly clicking Save. If you just jump, the answer is NOT saved.
+            // We will follow: If you just click palette, whatever is checked is NOT officially saved UNLESS it was saved before.
+            // So we just load the new question.
+            loadQuestion(index);
+        }
+
+        function handleSaveAndNext() {
+            const selected = getSelectedOption();
+            if (selected !== -1) {
+                userAnswers[currentQuestionIndex] = selected;
+                questionStatuses[currentQuestionIndex] = 2; // Answered
+            } else {
+                // If cleared or nothing selected
+                if(userAnswers[currentQuestionIndex] !== -1) {
+                    // Previously had answer, now doesn't (cleared manually via button, but this path is rare)
+                } else {
+                    questionStatuses[currentQuestionIndex] = 1; // Not Answered
+                }
+            }
+            goToNext();
+        }
+
+        function handleMarkAndNext() {
+            const selected = getSelectedOption();
+            if (selected !== -1) {
+                userAnswers[currentQuestionIndex] = selected;
+                questionStatuses[currentQuestionIndex] = 4; // Answered & Marked
+            } else {
+                questionStatuses[currentQuestionIndex] = 3; // Marked
+            }
+            goToNext();
+        }
+
+        function handleClearResponse() {
+            document.querySelectorAll('input[name="currentQuestionOpt"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('label').forEach(l => l.classList.remove("border-blue-500", "bg-blue-50"));
+            userAnswers[currentQuestionIndex] = -1;
+            questionStatuses[currentQuestionIndex] = 1; // Revert to Not Answered
+            renderPalette();
+            updateLegendCounters();
+        }
+
+        function handlePrevious() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function goToNext() {
+            if (currentQuestionIndex < TOTAL_QUESTIONS - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                // Last question, re-render to update status of last question
+                renderPalette();
+                updateLegendCounters();
+                showModal("End of Test", "You have reached the end of the test. Please review your answers or submit.");
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 5. TIMER
+        // ---------------------------------------------------------
+        function startTimer() {
+            const display = document.getElementById("timerDisplay");
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    display.textContent = "00:00";
+                    forceSubmit();
+                } else {
+                    timeLeft--;
+                    let m = Math.floor(timeLeft / 60);
+                    let s = timeLeft % 60;
+                    display.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    if(timeLeft < 300) { // last 5 mins
+                        display.classList.add("text-red-500", "animate-pulse");
+                    }
+                }
+            }, 1000);
+        }
+
+        // ---------------------------------------------------------
+        // 6. MODAL & SUBMISSION
+        // ---------------------------------------------------------
+        function showModal(title, text, isSubmit = false) {
+            document.getElementById("modalTitle").textContent = title;
+            document.getElementById("modalText").textContent = text;
+            
+            const actions = document.getElementById("modalActions");
+            if (isSubmit) {
+                actions.innerHTML = `
+                    <button onclick="closeModal()" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium">Cancel</button>
+                    <button onclick="executeSubmit()" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium">Yes, Submit</button>
+                `;
+            } else {
+                actions.innerHTML = `
+                    <button onclick="closeModal()" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium">OK</button>
+                `;
+            }
+            
+            document.getElementById("modalOverlay").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("modalOverlay").classList.add("hidden");
+        }
+
+        function confirmSubmit() {
+            showModal("Confirm Submission", "Are you sure you want to submit the test? You cannot change your answers after submission.", true);
+        }
+
+        function forceSubmit() {
+            closeModal();
+            executeSubmit();
+        }
+
+        function executeSubmit() {
+            clearInterval(timerInterval);
+            closeModal();
+            document.getElementById("mainCbtArea").classList.add("hidden");
+            document.getElementById("resultArea").classList.remove("hidden");
+            
+            calculateResults();
+        }
+
+        function calculateResults() {
+            let totalCorrect = 0;
+            let totalAttempted = 0;
+            
+            let subjectStats = subjectsData.map(sub => ({
+                name: sub.name,
+                total: sub.count,
+                attempted: 0,
+                correct: 0
+            }));
+
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                let ans = userAnswers[i];
+                let subId = questions[i].s;
+                
+                if (ans !== -1) {
+                    totalAttempted++;
+                    subjectStats[subId].attempted++;
+                    
+                    if (ans === questions[i].a) {
+                        totalCorrect++;
+                        subjectStats[subId].correct++;
+                    }
+                }
+            }
+
+            document.getElementById("resTotalScore").textContent = totalCorrect;
+            document.getElementById("resAttempted").textContent = totalAttempted;
+            document.getElementById("resCorrect").textContent = totalCorrect;
+            
+            let accuracy = totalAttempted > 0 ? ((totalCorrect / totalAttempted) * 100).toFixed(1) : 0;
+            document.getElementById("resAccuracy").textContent = accuracy + "%";
+
+            const tbody = document.getElementById("resTableBody");
+            tbody.innerHTML = "";
+            
+            subjectStats.forEach(stat => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b hover:bg-gray-50";
+                tr.innerHTML = `
+                    <td class="p-3 border font-medium">${stat.name}</td>
+                    <td class="p-3 border text-center">${stat.total}</td>
+                    <td class="p-3 border text-center">${stat.attempted}</td>
+                    <td class="p-3 border text-center text-green-600 font-bold">${stat.correct}</td>
+                    <td class="p-3 border text-center font-bold">${stat.correct}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
